@@ -1,0 +1,14 @@
+# Partición agrupada heredada del Lab 3 (robust-v3).
+# Cada clase tiene 3000 frames consecutivos de un mismo video; se agrupan en
+# ventanas de 100 frames y se asignan ventanas completas a cada partición.
+# Las ventanas que no aparecen en ninguna lista son separadores: evitan que
+# frames vecinos (casi idénticos) queden a ambos lados de una frontera.
+seed: 19644
+raw_dir: data/raw
+cache_dir: data/cache
+external_dir: data/external/asl-alphabet-test
+cache_size: 200          # tamaño nativo del dataset; el CPU solo decodifica
+group_window: 100
+train_windows: [0, 1, 2, 3, 11, 12, 13, 14, 15, 22, 23, 24, 25, 26, 27]
+validation_windows: [5, 6, 7, 8]
+test_windows: [17, 18, 19, 20]
