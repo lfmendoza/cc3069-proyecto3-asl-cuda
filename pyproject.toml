@@ -1,0 +1,79 @@
+[project]
+name = "asl-cuda"
+version = "0.1.0"
+description = "Clasificador de alfabeto ASL acelerado con CUDA (CC3069 Proyecto 3)"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "numpy>=2.1",
+  "pandas>=2.2",
+  "pillow>=11.0",
+  "pyyaml>=6.0",
+  "scikit-learn>=1.6",
+  "matplotlib>=3.9",
+  "psutil>=6.0",
+  "nvidia-ml-py>=12.560",
+  "numba>=0.61",
+  "numba-cuda>=0.30",
+  "kaggle>=1.7",
+]
+
+[project.optional-dependencies]
+# Elegir exactamente uno de cpu / cu126 / cu130 al sincronizar (ver README).
+# cpu incluye solo el runtime de CUDA (8 MB) porque numba-cuda lo busca al importarse,
+# incluso en modo simulador; no hace falta GPU para usar este extra.
+cpu = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "cuda-toolkit[cudart]==13.*; sys_platform != 'darwin'"]
+cu126 = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "numba-cuda[cu12]>=0.30"]
+cu130 = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "numba-cuda[cu13]>=0.30"]
+demo = ["opencv-python>=4.10"]
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.11", "ipykernel>=6.29", "jupyter>=1.1", "nbformat>=5.10"]
+
+[project.scripts]
+asl-cuda = "asl_cuda.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.8,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv]
+conflicts = [[{ extra = "cpu" }, { extra = "cu126" }, { extra = "cu130" }]]
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform != 'darwin'" },
+  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu130", extra = "cu130" },
+]
+torchvision = [
+  { index = "pytorch-cpu", extra = "cpu", marker = "sys_platform != 'darwin'" },
+  { index = "pytorch-cu126", extra = "cu126" },
+  { index = "pytorch-cu130", extra = "cu130" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu130"
+url = "https://download.pytorch.org/whl/cu130"
+explicit = true
+
+[tool.ruff]
+line-length = 110
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
