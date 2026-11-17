@@ -1,0 +1,4 @@
+| Variante | Imágenes | Tiempo medio (s) | Desv. est. (s) | CV (%) | Imágenes/s | Speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| CPU 1 hilo (secuencial) | 960 | 21.9 | 0.593 | 2.710 | 43.9 | 1.000 |
+| CPU 8 hilos | 960 | 64.2 | 7.169 | 11.2 | 15.0 | 0.341 |

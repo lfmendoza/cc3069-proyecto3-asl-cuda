@@ -1,0 +1,5 @@
+Manifest: 66700 imágenes | train=43500, test=11600, validation=11600
+  train       43500 imágenes -> caché 17.9s, 2429 img/s, 1 procesos
+  validation  11600 imágenes -> caché 3.9s, 2984 img/s, 1 procesos
+  test        11600 imágenes -> caché 3.7s, 3158 img/s, 1 procesos
+Duplicados exactos entre particiones: 0

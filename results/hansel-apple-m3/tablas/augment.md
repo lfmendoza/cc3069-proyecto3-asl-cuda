@@ -1,0 +1,5 @@
+| Variante | Imágenes | Tiempo medio (s) | Desv. est. (s) | CV (%) | Imágenes/s | Speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| torchvision-PIL (Lab 3) | 1,160 | 1.691 | 0.042 | 2.511 | 685.8 | 1.000 |
+| Numba CPU 1 hilo | 1,160 | 1.581 | 0.007 | 0.455 | 733.8 | 1.070 |
+| Numba CPU 8 hilos | 1,160 | 0.442 | 0.004 | 0.867 | 2,624.9 | 3.828 |

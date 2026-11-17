@@ -1,0 +1,78 @@
+{
+  "host_tag": "hansel-apple-m3",
+  "platform": "macOS-27.3-arm64-arm-64bit",
+  "python": "3.12.5",
+  "cpu": "Apple M3",
+  "physical_cores": 8,
+  "logical_cores": 8,
+  "ram_gb": 24.0,
+  "device": "cpu",
+  "gpu": {
+    "available": false,
+    "numba_cuda_available": false
+  },
+  "packages": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.2",
+    "numba": "0.68.1",
+    "numba-cuda": null,
+    "numpy": "2.5.5",
+    "pillow": "13.0.0"
+  },
+  "commit": "a183c1e",
+  "bench_config": {
+    "images_per_class": 40,
+    "repeats": 5,
+    "warmup": 1,
+    "prep_workers": [
+      1,
+      2,
+      4,
+      8,
+      0
+    ],
+    "train_batches": 15,
+    "batch_size": 64,
+    "inference_batches": 20,
+    "latency_samples": 200,
+    "threads_per_block": [
+      [
+        8,
+        8
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        16,
+        16
+      ],
+      [
+        32,
+        8
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        32,
+        32
+      ]
+    ],
+    "gpu_batch_sweep": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "pipeline_repeats": 3,
+    "prep_images_per_class": 200
+  },
+  "images": 1160,
+  "phases": [
+    "pipeline"
+  ],
+  "quick": false
+}
