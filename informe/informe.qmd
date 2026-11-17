@@ -1,0 +1,43 @@
+---
+title: "Proyecto 3: Mejorando algoritmos con CUDA"
+subtitle: "Reconocimiento del alfabeto ASL con preparación de datos en CPU y entrenamiento en GPU"
+author:
+  - Fernando Mendoza
+  - Hansel
+  - Adrian
+date: today
+lang: es
+format:
+  pdf:
+    documentclass: article
+    papersize: letter
+    geometry: margin=2.2cm
+    fontsize: 10.5pt
+    toc: true
+    number-sections: false
+    colorlinks: true
+    fig-pos: "H"
+    tbl-cap-location: top
+---
+
+{{< include ../docs/01-analisis-secuencial.md >}}
+
+{{< include ../docs/02-medicion-secuencial.md >}}
+
+{{< include ../docs/03-oportunidades.md >}}
+
+{{< include ../docs/04-diseno-paralelo.md >}}
+
+{{< include ../docs/05-implementacion-cuda.md >}}
+
+{{< include ../docs/06-analisis-conclusiones.md >}}
+
+# Referencias
+
+- Akash Nagaraj, *ASL Alphabet* (Kaggle, `grassknoted/asl-alphabet`).
+- Dan Rasband, *ASL Alphabet Test* (Kaggle, `danrasband/asl-alphabet-test`).
+- A. Howard et al., "Searching for MobileNetV3", ICCV 2019.
+- P. Micikevicius et al., "Mixed Precision Training", ICLR 2018.
+- NVIDIA, *CUDA C++ Programming Guide* y *CUDA C++ Best Practices Guide*.
+- Numba, *CUDA Kernels* (documentación de `numba-cuda`).
+- A. H. Karp y H. P. Flatt, "Measuring Parallel Processor Performance", *Communications of the ACM* 33(5), 1990.
