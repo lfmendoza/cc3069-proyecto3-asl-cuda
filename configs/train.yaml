@@ -1,0 +1,45 @@
+# Receta de entrenamiento. Es la misma para CPU y GPU: lo único que cambia
+# entre corridas es el dispositivo y las optimizaciones propias de CUDA.
+seed: 19644
+architecture: mobilenet_v3_small
+pretrained: true
+image_size: 224
+batch_size: 64
+eval_batch_size: 256
+weight_decay: 0.0002
+label_smoothing: 0.0
+gradient_clip_norm: 1.0
+early_stopping_patience: 3
+stages:
+  - name: head
+    epochs: 2
+    unfrozen_blocks: 0
+    backbone_lr: 0.0
+    head_lr: 0.001
+  - name: finetune
+    epochs: 12
+    unfrozen_blocks: 4
+    backbone_lr: 0.0001
+    head_lr: 0.0003
+augment:
+  scale: [0.70, 1.0]
+  ratio: [0.90, 1.10]
+  rotation_deg: 10.0
+  translate: 0.07
+  zoom: [0.93, 1.07]
+  perspective: 0.12
+  perspective_p: 0.12
+  brightness: 0.20
+  contrast: 0.20
+  saturation: 0.12
+  erase_p: 0.10
+  erase_area: [0.01, 0.05]
+  eval_crop: 0.875
+cuda:
+  amp: true
+  channels_last: true
+  cudnn_benchmark: true
+  threads_per_block: [16, 16]
+  augment_device: gpu      # gpu = kernel Numba CUDA; cpu = kernel Numba en núcleos del CPU
+cpu:
+  threads: 0               # 0 = todos los núcleos lógicos
