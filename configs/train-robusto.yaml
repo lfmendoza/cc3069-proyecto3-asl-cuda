@@ -1,0 +1,48 @@
+# Variante con aumentación más agresiva para mejorar el desempeño fuera del
+# dominio (fotos con otro fondo, otra luz, otra persona). Solo es viable en GPU:
+# en CPU la receta completa tomaría horas por cada prueba.
+# Se compara contra train.yaml usando la mitad "seleccion" del dataset externo;
+# la mitad "final" se reporta una sola vez con el modelo elegido.
+seed: 19644
+architecture: mobilenet_v3_small
+pretrained: true
+image_size: 224
+batch_size: 64
+eval_batch_size: 256
+weight_decay: 0.0002
+label_smoothing: 0.1
+gradient_clip_norm: 1.0
+early_stopping_patience: 3
+stages:
+  - name: head
+    epochs: 2
+    unfrozen_blocks: 0
+    backbone_lr: 0.0
+    head_lr: 0.001
+  - name: finetune
+    epochs: 15
+    unfrozen_blocks: 8
+    backbone_lr: 0.0001
+    head_lr: 0.0003
+augment:
+  scale: [0.45, 1.0]
+  ratio: [0.90, 1.10]
+  rotation_deg: 15.0
+  translate: 0.10
+  zoom: [0.93, 1.07]
+  perspective: 0.12
+  perspective_p: 0.30
+  brightness: 0.40
+  contrast: 0.40
+  saturation: 0.60
+  erase_p: 0.35
+  erase_area: [0.02, 0.12]
+  eval_crop: 0.875
+cuda:
+  amp: true
+  channels_last: true
+  cudnn_benchmark: true
+  threads_per_block: [16, 16]
+  augment_device: gpu      # gpu = kernel Numba CUDA; cpu = kernel Numba en núcleos del CPU
+cpu:
+  threads: 0               # 0 = todos los núcleos lógicos
