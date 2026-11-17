@@ -1,0 +1,14 @@
+# Protocolo de medición. Todas las variantes procesan exactamente las mismas
+# imágenes (subconjunto determinista de train) con el mismo modelo.
+images_per_class: 40          # 1160 imágenes
+prep_images_per_class: 200    # 5800 imágenes solo para la fase 1 (con menos, domina el arranque de procesos)
+repeats: 5
+pipeline_repeats: 3           # la época completa en 1 hilo es lenta; 3 repeticiones bastan
+warmup: 1
+prep_workers: [1, 2, 4, 8, 0] # 0 = todos los núcleos lógicos
+train_batches: 15
+batch_size: 64
+inference_batches: 20
+latency_samples: 200
+threads_per_block: [[8, 8], [16, 8], [16, 16], [32, 8], [32, 16], [32, 32]]
+gpu_batch_sweep: [32, 64, 128, 256]
