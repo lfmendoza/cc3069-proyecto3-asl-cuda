@@ -5,7 +5,11 @@ PR.
 
 1. Todos los PRs integrados y CI en verde.
 2. Tabla de resultados del `README.md` completa.
-3. PDF final:
+3. Tablas y figuras al día (no debe listar nada pendiente):
+   ```bash
+   uv run --no-sync asl-cuda informe --tag <tag-adrian> --cpu-tag hansel-apple-m3
+   ```
+   PDF final:
    ```bash
    quarto render informe/informe.qmd --to pdf
    ```
@@ -21,7 +25,7 @@ PR.
    y cualquier carpeta de resultados de pruebas (`results/*-quick`, etc.).
 6. Barrido final de texto (no debe devolver nada):
    ```bash
-   git grep -n -i -E "TODO|FIXME|pendiente|completar con|lorem"
+   git grep -n -i -E "TODO|FIXME|pendiente|completar con|lorem|\[\["
    git grep -n -E "C:\\\\Users|/home/" -- ':!*.lock'
    git log --format=%B | grep -i -E "co-authored|generated|signed-off" || true
    ```

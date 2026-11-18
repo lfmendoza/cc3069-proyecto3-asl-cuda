@@ -19,7 +19,7 @@ Lee también `README.md` (plan y reglas de Git) y `convenciones.md`.
    ```
 3. Clona y crea tu rama:
    ```powershell
-   git clone <url-del-repo> cc3069-proyecto3-asl-cuda
+   git clone https://github.com/lfmendoza/cc3069-proyecto3-asl-cuda.git cc3069-proyecto3-asl-cuda
    cd cc3069-proyecto3-asl-cuda
    git switch -c adrian/entorno-gpu
    ```
@@ -112,6 +112,17 @@ con los nombres de `evidencia/README.md`:
    la gráfica Cuda más baja que en la captura 3. Es la evidencia de que la
    aumentación en CPU deja a la GPU esperando.
 
+### Llevar los resultados al informe
+
+El último paso del script (`11-informe`) copia tus tablas y figuras a
+`informe/tablas/` e `informe/figuras/`. Como las capturas se guardan
+mientras corre, cuando ya estén todas en `evidencia/` vuelve a correrlo:
+```powershell
+uv run --no-sync asl-cuda informe --cpu-tag hansel-apple-m3
+```
+Al final imprime lo que todavía falta. Debe decir que no queda nada
+pendiente de `results/<tu-tag>` ni de `evidencia/`.
+
 ### Revisión antes de subir
 
 - `results/<tag>/logs/duraciones.tsv` tiene todos los pasos.
@@ -123,7 +134,7 @@ con los nombres de `evidencia/README.md`:
 - `git status`: no debe aparecer nada de `data/` ni `scratch/`.
 
 ```powershell
-git add results/$env:ASL_HOST_TAG models evidencia
+git add results/$env:ASL_HOST_TAG models evidencia informe/tablas informe/figuras
 git commit -m "data: corrida oficial en $env:ASL_HOST_TAG"
 git push -u origin adrian/corrida-oficial
 ```
@@ -132,48 +143,27 @@ lo necesita para probar las fotos del equipo.
 
 ## Paso 4 · Sección 5 del informe (Hito 3, día 3)
 
-En una rama `adrian/seccion-5`, completa `docs/05-implementacion-cuda.md`.
-Ya tiene los títulos y la tabla de componentes. Contenido mínimo:
+`docs/05-implementacion-cuda.md` ya está redactada completa; las tablas y
+figuras entran solas con `asl-cuda informe`. Lo único que falta son los
+datos de tu laptop, marcados con `[[GPU: ...]]`:
 
-- **5.1 Entorno:** modelo de GPU, núcleos/SM (sale en `environment.json`),
-  VRAM, driver, versión de CUDA de torch, CPU y RAM, y las condiciones de la
-  sección anterior.
-- **5.2 Componentes:** la tabla ya está; agrega 2–3 párrafos explicando con
-  tus palabras cómo viaja un lote: memmap → buffer pinned → copia
-  asíncrona → kernel → red. Cita `feeders.py` y `augment.py`.
-- **5.3 Tiempos medidos en GPU:** pega `train.md`, `inference.md` y la parte
-  GPU de `augment.md` y `pipeline.md`. Comenta: cuánto aporta cada
-  optimización (fp32 → cudnn.benchmark → channels_last → AMP), cuánto cuesta
-  la copia H2D comparada con el kernel (`transferencias.md` y la fila
-  "CUDA kernel + H2D + D2H"), y el `data_wait_seconds` del historial de
-  `base-cuda` comparado con el de `base-cuda-aug-cpu`.
-- **5.4 Hilos por bloque:** tabla `kernel_bloques.md` y figura
-  `kernel_bloques.png`. Explica el resultado: con muy pocos hilos por bloque
-  (8×8 = 64) hay pocos warps por bloque; con 32×32 = 1024 hilos caben menos
-  bloques por SM. Relaciónalo con el ejercicio de clase de 128/256/512 hilos.
-  Agrega el barrido de tamaño de lote (`train_lote_gpu.md`) y la memoria pico.
-- **5.5 Evidencia:** las 6 capturas con una oración cada una, más las
-  figuras `monitor_bench.png` y `monitor_base-cuda.png`.
+```powershell
+git switch main; git pull; git switch -c adrian/seccion-5
+git grep -n "\[\[" docs/05-implementacion-cuda.md
+```
 
-Todos los números salen de los archivos de `results/<tag>/`. Si un resultado
-no coincide con lo que dice el diseño (sección 4), dilo y explica por qué
-crees que pasó; eso también es análisis.
-
-## Paso 5 · Parte GPU de la sección 6 (día 3–4)
-
-Coordina con Hansel en su rama `hansel/informe` (o mándale el texto). Te toca
-responder en `docs/06`:
-
-- **¿Cómo CUDA permitió reducir o cambiar el tiempo?** Con tus números:
-  speedup del paso de entrenamiento, de la época completa y la proyección del
-  entrenamiento completo (`proyeccion_entrenamiento.md`) contra las 3.7 h del
-  Lab 3. Menciona qué hizo posible la receta `train-robusto` (probar una
-  receta más cara en minutos).
-- **Factores que limitan CUDA:** costo de la copia PCIe, lanzamiento de
-  kernels con lotes pequeños (la latencia de 1 imagen en GPU vs CPU en
-  `inference.md`), memoria de la GPU (lote máximo), límites de potencia y
-  temperatura en laptops (columna de potencia/temperatura en `nvidia-smi.csv`),
-  tiempo de calentamiento (compilación de Numba, cuDNN benchmark).
+Cada marca dice exactamente qué dato va y de qué archivo sale. Reemplázala
+por el número o por la oración que pide, con tus palabras (ver
+`convenciones.md`). Si un resultado contradice lo que dice el texto (por
+ejemplo, que 16 × 16 no sea de los más rápidos), cambia la oración: el
+informe tiene que decir lo que mediste, y explicar por qué crees que pasó
+también es análisis. Compila para revisar:
+```powershell
+quarto render informe/informe.qmd --to pdf
+```
+Las marcas `[[GPU: ...]]` de `docs/02` y `docs/06` las llena Fernando con tu
+corrida; si notas algo que deba decirse ahí (el reloj de la GPU bajó, la
+laptop se calentó, algo falló y se repitió), anótalo en el PR.
 
 ## Paso 6 · Notebook y demo (día 3–4)
 

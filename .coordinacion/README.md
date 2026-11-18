@@ -20,7 +20,7 @@ comparar. La rúbrica pesa:
 Entregables finales: código + notebook (`notebooks/proyecto3_asl_cuda.ipynb`
 ejecutado con salidas), informe PDF, capturas y presentación.
 
-## Estado actual (ya hecho por Fernando)
+## Estado actual
 
 - Repositorio, entorno reproducible (`uv`), pruebas y CI.
 - Pipeline completo: decodificación paralela en CPU, kernel Numba CUDA,
@@ -31,8 +31,15 @@ ejecutado con salidas), informe PDF, capturas y presentación.
   coincide con la referencia en el simulador de Numba, la caché de 66,700
   imágenes se arma en 16 s con 20 procesos, un entrenamiento piloto alcanza
   0.91 de macro F1 con solo 150 imágenes por clase.
-- Secciones 1, 3 y 4 del informe escritas (`docs/01`, `docs/03`, `docs/04`).
-- **No probado todavía en GPU real.** Es lo primero que hace Adrian.
+- Hansel: entorno y corrida CPU en la M3 integrados (PR #1).
+- Informe redactado completo (secciones 1 a 6). Lo que depende de la corrida
+  en GPU está marcado con `[[GPU: ...]]`; las tablas y figuras entran solas
+  con `asl-cuda informe`, que ya corre al final de `scripts/corrida_gpu.ps1`.
+  El PDF compila hoy con avisos de "pendiente" en esos lugares.
+- Notebook entregable armado y probado en CPU.
+- **No probado todavía en GPU real.** Es lo primero que hace Adrian; después
+  de su corrida oficial solo quedan: fotos del equipo (Hansel), llenar las
+  marcas `[[...]]` y la presentación.
 
 ## Reparto
 
@@ -54,9 +61,9 @@ entrega es antes, se comprimen los hitos 2 y 3, nunca el 1.
 | H1 · Entornos | 1 | Adrian, Hansel | `asl-cuda env` corre; en la laptop de Adrian dice "kernel ... OK"; `pytest` pasa en ambos. Adrian además: `ASL_REAL_GPU=1 pytest tests/test_gpu.py` pasa. |
 | H2 · Corridas oficiales | 2 | Adrian | `scripts/corrida_gpu.ps1` completo, `results/adrian-<gpu>/` y `models/asl_mobilenetv3.pt` en una rama con PR. Capturas en `evidencia/`. |
 | H2 · Corrida CPU y fotos | 2 | Hansel (+ todos para las fotos) | `results/hansel-<cpu>/` en PR. Fotos de los tres en `.local/fotos-equipo/` (no se suben). |
-| H3 · Datos nuevos y notebook | 3 | Hansel | Evaluación de fotos del equipo con el modelo final; notebook armado. |
-| H3 · Sección 5 | 3 | Adrian | `docs/05` completo; notebook ejecutado en GPU con salidas. |
-| H4 · Informe | 4 | Hansel + Adrian, revisión Fernando | `docs/02` y `docs/06` completos; PDF compilado. |
+| H3 · Datos nuevos | 3 | Hansel | Evaluación de fotos del equipo con el modelo final; párrafo de fotos en 6.5. |
+| H3 · Sección 5 | 3 | Adrian | Marcas `[[GPU]]` de `docs/05` llenas; notebook ejecutado en GPU con salidas. |
+| H4 · Informe | 4 | Fernando, revisión de los tres | Marcas `[[GPU]]` de `docs/02` y `docs/06` llenas; PDF compilado sin avisos. |
 | H5 · Cierre | 5 | Todos | Ensayo de presentación, `cierre.md` ejecutado, PDF final, tag `v1.0`. |
 
 Dependencias duras: H3 de Hansel necesita `models/asl_mobilenetv3.pt` de
@@ -83,7 +90,8 @@ sus propios números de CPU.
 | `tests/test_gpu.py` | Adrian | — |
 | `tests/` archivos nuevos | Hansel | — |
 | `docs/01`, `docs/03`, `docs/04` | Fernando | sugerir cambios en el PR |
-| `docs/02`, `docs/06`, `informe/`, `notebooks/` | Hansel | Adrian escribe la parte GPU de `docs/06` en su propia rama |
+| `docs/02`, `docs/06`, `notebooks/` | Fernando | Hansel escribe el párrafo de fotos de 6.5; Adrian sube el notebook ejecutado |
+| `informe/tablas`, `informe/figuras` | se generan con `asl-cuda informe` | quien corra el comando en su PR |
 | `docs/05`, `evidencia/`, `models/`, `scripts/corrida_gpu.*` | Adrian | — |
 | `results/adrian-*/` | Adrian | nadie lo toca |
 | `results/hansel-*/` | Hansel | nadie lo toca |
