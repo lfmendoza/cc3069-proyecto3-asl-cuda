@@ -3,29 +3,3 @@ Manifest: 66700 imágenes | train=43500, test=11600, validation=11600
   validation  11600 imágenes -> caché 1.6s, 7166 img/s, 8 procesos
   test        11600 imágenes -> caché 1.6s, 7285 img/s, 8 procesos
 Duplicados exactos entre particiones: 0
-odex/2026-11-17/me-x20/work/cc3069-proyecto3-asl-cuda/src/asl_cuda/cli.py", line 309, in main
-    args.func(args)
-  File "/Users/hansellopez/Documents/Codex/2026-11-17/me-x20/work/cc3069-proyecto3-asl-cuda/src/asl_cuda/cli.py", line 89, in cmd_prep
-    meta = build_split_cache(absolute_paths(part), part["label"].to_numpy(), cache_dir, split, dcfg.cache_size,
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/hansellopez/Documents/Codex/2026-11-17/me-x20/work/cc3069-proyecto3-asl-cuda/src/asl_cuda/prep.py", line 176, in build_split_cache
-    stats, shas = decode_to_npy(paths, images_path, size, workers)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Users/hansellopez/Documents/Codex/2026-11-17/me-x20/work/cc3069-proyecto3-asl-cuda/src/asl_cuda/prep.py", line 116, in decode_to_npy
-    results = list(pool.map(_decode_chunk, tasks))
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/process.py", line 642, in _chain_from_iterable_of_lists
-    for element in iterable:
-                   ^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/_base.py", line 619, in result_iterator
-    yield _result_or_cancel(fs.pop())
-          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/_base.py", line 317, in _result_or_cancel
-    return fut.result(timeout)
-           ^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/_base.py", line 456, in result
-    return self.__get_result()
-           ^^^^^^^^^^^^^^^^^^^
-  File "/Library/Frameworks/Python.framework/Versions/3.12/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
-    raise self._exception
-concurrent.futures.process.BrokenProcessPool: A process in the process pool was terminated abruptly while the future was running or pending.
