@@ -1,1 +1,4 @@
-**[[Tabla pendiente: `results/adrian-gpu/tablas/transferencias.md`]]**
+| Variante | Imágenes | Tiempo medio (s) | Desv. est. (s) | CV (%) | Imágenes/s |
+|----------------------------------------|-------:|---------------:|-------------:|-----:|---------:|
+| H2D lote uint8 200x200 (propuesta) | 1,160 | 0.011 | 0.000 | 0.881 | 103,125.0 |
+| H2D lote float32 224x224 (aumentar en CPU) | 1,160 | 0.066 | 0.026 | 38.8 | 17,510.0 |

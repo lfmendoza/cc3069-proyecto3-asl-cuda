@@ -1,0 +1,85 @@
+{
+  "host_tag": "adrian-rtx3050",
+  "platform": "Windows-11-10.0.26300-SP0",
+  "python": "3.12.16",
+  "cpu": "AMD Ryzen 5 7235HS",
+  "physical_cores": 4,
+  "logical_cores": 8,
+  "ram_gb": 15.7,
+  "device": "cpu",
+  "gpu": {
+    "available": true,
+    "name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
+    "capability": "8.6",
+    "multiprocessors": 20,
+    "memory_gb": 6.0,
+    "torch_cuda": "13.0",
+    "cudnn": 92400,
+    "driver": "591.66",
+    "numba_cuda_available": true
+  },
+  "packages": {
+    "torch": "2.14.1+cu130",
+    "torchvision": "0.29.1+cu130",
+    "numba": "0.68.1",
+    "numba-cuda": "0.30.4",
+    "numpy": "2.4.6",
+    "pillow": "13.0.0"
+  },
+  "commit": "b863b37",
+  "bench_config": {
+    "images_per_class": 40,
+    "repeats": 5,
+    "warmup": 1,
+    "prep_workers": [
+      1,
+      2,
+      4,
+      8,
+      0
+    ],
+    "train_batches": 15,
+    "batch_size": 64,
+    "inference_batches": 20,
+    "latency_samples": 200,
+    "threads_per_block": [
+      [
+        8,
+        8
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        16,
+        16
+      ],
+      [
+        32,
+        8
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        32,
+        32
+      ]
+    ],
+    "gpu_batch_sweep": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "pipeline_repeats": 3,
+    "prep_images_per_class": 200
+  },
+  "images": 1160,
+  "phases": [
+    "prep"
+  ],
+  "quick": false
+}

@@ -1,1 +1,7 @@
-**[[Tabla pendiente: `results/adrian-gpu/tablas/prep.md`]]**
+| Variante | Procesos/hilos | Tiempo medio (s) | Desv. est. (s) | Imágenes/s | Speedup | Eficiencia | Karp-Flatt e |
+|---------------------------|-------------:|---------------:|-------------:|---------:|------:|---------:|-----------:|
+| secuencial | 1 | 3.928 | 0.135 | 1,476.5 | 1.000 | 1.000 |  |
+| procesos=2 | 2 | 2.312 | 0.091 | 2,508.2 | 1.699 | 0.849 | 0.177 |
+| procesos=4 | 4 | 1.786 | 0.060 | 3,247.4 | 2.199 | 0.550 | 0.273 |
+| procesos=8 | 8 | 1.749 | 0.056 | 3,316.9 | 2.246 | 0.281 | 0.366 |
+| hilos=4 (mismo código, GIL) | 4 | 1.935 | 0.038 | 2,997.8 | 2.030 | 0.508 |  |
