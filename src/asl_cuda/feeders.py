@@ -73,7 +73,7 @@ class CudaFeeder(_Base):
         self.ready = [torch.cuda.Event(), torch.cuda.Event()]
         self.mean = torch.from_numpy(IMAGENET_MEAN).to(device)
         self.std = torch.from_numpy(IMAGENET_STD).to(device)
-        self.labels = torch.from_numpy(np.asarray(self.data.labels, dtype=np.int64)).to(device)
+        self.labels = torch.from_numpy(np.array(self.data.labels, dtype=np.int64)).to(device)  # copia: el memmap es de solo lectura
         self.data_wait = 0.0  # segundos que el CPU pasó armando lotes (para el reporte)
 
     def __iter__(self) -> Iterator[tuple[torch.Tensor, torch.Tensor]]:

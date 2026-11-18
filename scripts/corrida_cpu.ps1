@@ -6,13 +6,18 @@ param([Parameter(Mandatory = $true)][string]$Tag)
 $ErrorActionPreference = "Continue"
 $env:ASL_HOST_TAG = $Tag
 $env:PYTHONUTF8 = "1"
+# La consola lee la salida de Python como UTF-8 (si no, los acentos salen mal en los logs).
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $out = "results\$Tag"
 New-Item -ItemType Directory -Force "$out\logs" | Out-Null
 
 function Paso([string]$nombre, [string[]]$argumentos) {
     Write-Host "`n=== $nombre ===" -ForegroundColor Cyan
-    uv run --no-sync asl-cuda @argumentos 2>&1 | Tee-Object -FilePath "$out\logs\$nombre.log"
-    if ($LASTEXITCODE -ne 0) { throw "Falló el paso $nombre" }
+    # "$_" deja los avisos de stderr como texto normal; el log se guarda en UTF-8.
+    uv run --no-sync asl-cuda @argumentos 2>&1 | ForEach-Object { "$_" } | Tee-Object -Variable salida
+    $codigo = $LASTEXITCODE
+    $salida | Out-File -Encoding utf8 "$out\logs\$nombre.log"
+    if ($codigo -ne 0) { throw "Falló el paso $nombre" }
 }
 
 Paso "00-env" @("env")
