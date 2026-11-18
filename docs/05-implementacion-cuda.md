@@ -202,7 +202,7 @@ completos están en `results/<equipo>/logs/`.
 
 ![Administrador de tareas durante la decodificación: todos los núcleos lógicos ocupados.](../informe/figuras/evidencia_01-prep-cpu-administrador.png){width=90%}
 
-![Administrador de tareas durante la época del Lab 3 en un solo hilo: un núcleo trabajando a la vez.](../informe/figuras/evidencia_02-secuencial-cpu-administrador.png){width=90%}
+![Administrador de tareas durante la época del Lab 3 en un solo hilo: ningún núcleo saturado y uso total bajo (el monitor registró 29 % en promedio, contra 93 % al decodificar con 8 procesos). Windows mueve el hilo entre núcleos, por eso la carga se ve repartida.](../informe/figuras/evidencia_02-secuencial-cpu-administrador.png){width=90%}
 
 ![GPU NVIDIA durante el entrenamiento: uso al 98 % y 1.8 GB de memoria dedicada. Windows 11 cuenta el trabajo de CUDA en el motor "3D" cuando está activada la programación de GPU acelerada por hardware.](../informe/figuras/evidencia_03-train-gpu-administrador.png){width=90%}
 
