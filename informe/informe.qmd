@@ -2,10 +2,10 @@
 title: "Proyecto 3: Mejorando algoritmos con CUDA"
 subtitle: "Reconocimiento del alfabeto ASL con preparación de datos en CPU y entrenamiento en GPU"
 author:
+  - Adrián González
   - Fernando Mendoza
-  - Hansel
-  - Adrian
-date: today
+  - Hansel López
+date: "18 de noviembre de 2026"
 lang: es
 format:
   pdf:
@@ -14,10 +14,49 @@ format:
     geometry: margin=2.2cm
     fontsize: 10.5pt
     toc: true
+    toc-title: "Índice"
+    toc-depth: 2
     number-sections: false
     colorlinks: true
+    linkcolor: black
+    urlcolor: black
+    citecolor: black
+    filecolor: black
+    toccolor: black
     fig-pos: "H"
     tbl-cap-location: top
+    include-in-header:
+      text: |
+        \usepackage{graphicx}
+        \renewcommand{\maketitle}{%
+          \begin{titlepage}
+          \centering
+          \vspace*{1cm}
+          \includegraphics[width=4.2cm]{figuras/escudo-uvg.png}\par
+          \vspace{1.4cm}
+          {\large Universidad del Valle de Guatemala\par}
+          \vspace{0.25cm}
+          {\large CC3069 Computación Paralela y Distribuida\par}
+          \vspace{0.25cm}
+          {Catedrática: Kimberly Barrera\par}
+          \vspace{2.4cm}
+          {\LARGE\bfseries Proyecto 3: Mejorando algoritmos con CUDA\par}
+          \vspace{0.6cm}
+          {\large Reconocimiento del alfabeto ASL con preparación de datos\\ en CPU y entrenamiento en GPU\par}
+          \vspace{2.4cm}
+          {\large Integrantes\par}
+          \vspace{0.4cm}
+          \begin{tabular}{l@{\hspace{1.2cm}}r}
+          Adrián González & 23152 \\
+          Fernando Mendoza & 19644 \\
+          Hansel López & 19026 \\
+          \end{tabular}\par
+          \vfill
+          {\large Guatemala, 18 de noviembre de 2026\par}
+          \end{titlepage}
+          \setcounter{page}{1}}
+        \let\indiceoriginal\tableofcontents
+        \renewcommand{\tableofcontents}{\indiceoriginal\clearpage}
 ---
 
 {{< include ../docs/01-analisis-secuencial.md >}}

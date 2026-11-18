@@ -2,7 +2,7 @@
 
 **CC3069 Computación Paralela y Distribuida — Universidad del Valle de Guatemala**
 
-Fernando Mendoza · Hansel · Adrian
+Adrián González (23152) · Fernando Mendoza (19644) · Hansel López (19026)
 
 Tomamos el clasificador del alfabeto de señas americano (ASL) del Laboratorio 3
 de Data Science y lo reorganizamos en dos fases: el CPU, con todos sus
@@ -142,5 +142,5 @@ ASL_REAL_GPU=1 uv run --no-sync pytest tests/test_gpu.py -v   # con GPU real
 | Integrante | Aporte |
 |---|---|
 | Fernando Mendoza | Algoritmo base (Lab 3), análisis de la solución secuencial, identificación de oportunidades y diseño del algoritmo paralelo; implementación del pipeline y del kernel. |
-| Hansel | Medición de la versión secuencial y CPU multinúcleo, pruebas con datos nuevos (test interno y dataset externo), notebook, análisis comparativo e informe. |
-| Adrian | Ejecución y validación en GPU, experimentos de configuración de hilos/bloques y tamaño de lote, entrenamiento final, evidencia de uso de recursos y sección de implementación CUDA. |
+| Hansel López | Medición de la versión secuencial y CPU multinúcleo, pruebas con datos nuevos (test interno y dataset externo), notebook, análisis comparativo e informe. |
+| Adrián González | Ejecución y validación en GPU, experimentos de configuración de hilos/bloques y tamaño de lote, entrenamiento final, evidencia de uso de recursos y sección de implementación CUDA. |
