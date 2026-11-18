@@ -204,7 +204,7 @@ completos están en `results/<equipo>/logs/`.
 
 ![Administrador de tareas durante la época del Lab 3 en un solo hilo: ningún núcleo saturado y uso total bajo (el monitor registró 29 % en promedio, contra 93 % al decodificar con 8 procesos). Windows mueve el hilo entre núcleos, por eso la carga se ve repartida.](../informe/figuras/evidencia_02-secuencial-cpu-administrador.png){width=90%}
 
-![GPU NVIDIA durante el entrenamiento: uso al 98 % y 1.8 GB de memoria dedicada. Windows 11 cuenta el trabajo de CUDA en el motor "3D" cuando está activada la programación de GPU acelerada por hardware.](../informe/figuras/evidencia_03-train-gpu-administrador.png){width=90%}
+![GPU NVIDIA durante el entrenamiento: uso al 95 % y 1.7 GB de memoria dedicada. Windows 11 cuenta el trabajo de CUDA en el motor "3D" cuando está activada la programación de GPU acelerada por hardware.](../informe/figuras/evidencia_03-train-gpu-administrador.png){width=90%}
 
 ![`nvidia-smi` durante el entrenamiento, con el proceso de Python en la lista.](../informe/figuras/evidencia_04-train-nvidia-smi.png){width=90%}
 
