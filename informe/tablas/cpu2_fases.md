@@ -1,7 +1,7 @@
 | Fase | Secuencial (ms/img) | Mejor variante CPU | CPU (ms/img) | Speedup CPU | GPU (ms/img) | Speedup GPU |
 |-------------------------|------------------:|----------------------------------------|-----------:|----------:|-----------:|----------:|
-| Decodificación (fase 1) | 0.244 | procesos=4 | 0.123 | 1.983 |  |  |
-| Transformación de entrada | 1.458 | Numba CPU 8 hilos | 0.381 | 3.828 |  |  |
-| Paso de entrenamiento | 22.8 | CPU 8 hilos | 66.8 | 0.341 |  |  |
-| Inferencia por lotes | 17.2 | CPU 8 hilos lote 64 | 17.5 | 0.983 |  |  |
-| Época completa | 22.0 | Híbrido CPU (caché + Numba CPU, 8 hilos) | 45.7 | 0.481 |  |  |
+| Decodificación (fase 1) | 0.593 | procesos=8 | 0.151 | 3.919 |  |  |
+| Transformación de entrada | 5.036 | Numba CPU 20 hilos | 0.404 | 12.5 |  |  |
+| Paso de entrenamiento | 12.2 | CPU 20 hilos | 8.399 | 1.450 |  |  |
+| Inferencia por lotes | 9.112 | CPU 20 hilos lote 64 | 4.004 | 2.276 |  |  |
+| Época completa | 22.3 | Híbrido CPU (caché + Numba CPU, 20 hilos) | 8.104 | 2.748 |  |  |

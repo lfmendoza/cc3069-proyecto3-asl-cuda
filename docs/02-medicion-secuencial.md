@@ -32,12 +32,15 @@ rendimiento, sin otras aplicaciones abiertas y la misma versión del código
 `results/<equipo>/bench/` y el uso de cada núcleo, medido cada 0.25 s, en
 `results/<equipo>/bench/monitor.csv`.
 
-Medimos en dos computadoras. Los números oficiales, y todos los speedup del
+Medimos en tres computadoras. Los números oficiales, y todos los speedup del
 informe, son de la laptop de Adrian, porque ahí se mide también la GPU y el
-speedup solo tiene sentido dentro de la misma máquina. La segunda computadora
-es la MacBook de Hansel (Apple M3, 8 núcleos: 4 de rendimiento y 4 de
-eficiencia, 24 GB de RAM); sirve para ver cómo cambia el escalamiento en CPU
-con otra arquitectura.
+speedup solo tiene sentido dentro de la misma máquina. Las otras dos sirven
+para ver cómo cambia el escalamiento en CPU con otra arquitectura:
+
+| Equipo | Procesador | Núcleos | RAM | Sistema |
+|---|---|---|---|---|
+| Laptop de Fernando | AMD Ryzen AI 9 365 | 10 físicos (4 Zen 5 y 6 Zen 5c), 20 lógicos | 15.3 GB visibles en WSL2 | Linux en WSL2 sobre Windows |
+| MacBook de Hansel | Apple M3 | 8 (4 de rendimiento y 4 de eficiencia) | 24 GB | macOS |
 
 ## 2.2 Resultados en la laptop de la corrida oficial
 
@@ -77,16 +80,98 @@ Las variantes en CPU de la transformación de entrada, del paso de
 entrenamiento y de la inferencia están en las tablas de la sección 5.3, junto
 a las de GPU, para que la comparación quede en un solo lugar.
 
-## 2.3 Resultados en la segunda computadora (Apple M3)
+## 2.3 Resultados en la laptop de Fernando (Ryzen AI 9 365)
+
+Esta corrida se hizo con la laptop conectada, sin otras aplicaciones y sin
+usarla mientras corría. El monitor lo confirma: durante las variantes de un
+solo hilo el uso total del CPU fue de 5.4 %, que es justo un núcleo lógico de
+20; no había otra carga.
+
+: Época completa en la Ryzen (1,160 imágenes, media de 3 repeticiones).
+
+{{< include ../informe/tablas/cpu2_pipeline.md >}}
+
+El Lab 3 en un hilo procesa 44.9 imágenes por segundo. De los 25.8 s de la
+época, 5.4 s (21 %) son abrir, decodificar y transformar imágenes y 20.4 s son
+la red. Con la configuración con la que se entregó (4 *workers* y todos los
+hilos) la época baja a 15.5 s, un speedup de 1.67, y la parte de datos casi
+desaparece del hilo principal (1.05 s) porque la hacen los *workers* en
+paralelo. Con la caché y el kernel de Numba en CPU baja a 9.4 s (2.75×).
+
+Esa última fila tiene un CV de 26 %: la primera repetición tardó 6.5 s y las
+dos siguientes 10.8 y 10.9 s. Las tres usan los 20 hilos lógicos al 96 %
+durante más de 30 s seguidos, y lo más probable es que la laptop haya bajado
+la frecuencia por temperatura. Desde WSL2 no pudimos leer la frecuencia del
+procesador para confirmarlo, así que lo dejamos como hipótesis; es también
+un aviso para la corrida en GPU, que corre en otra laptop con el mismo
+problema.
+
+: Proyección del entrenamiento completo en la Ryzen.
+
+{{< include ../informe/tablas/cpu2_proyeccion_entrenamiento.md >}}
+
+Con la caché y el kernel en CPU, el entrenamiento completo pasaría de 3.77
+a 1.38 horas sin usar GPU. Es la ganancia de hacer la decodificación una sola
+vez y de reemplazar PIL por el kernel, antes de cualquier aceleración en la
+GPU.
+
+: Paso de entrenamiento, inferencia y transformación de entrada en la Ryzen.
+
+{{< include ../informe/tablas/cpu2_train.md >}}
+
+{{< include ../informe/tablas/cpu2_inference.md >}}
+
+{{< include ../informe/tablas/cpu2_augment.md >}}
+
+Aquí los hilos de PyTorch sí ayudan, pero poco: el paso de entrenamiento
+mejora 1.45 veces con 20 hilos, aunque el monitor muestra los 20 hilos
+lógicos al 96 %. En Linux, PyTorch usa OpenMP y sus hilos esperan activamente
+(*spin*) en cada barrera entre operaciones, así que un núcleo ocupado no
+significa un núcleo haciendo trabajo útil. Con una sola imagen, 20 hilos son
+más lentos que uno (9.4 ms contra 5.3 ms): cada capa tiene tan poco trabajo
+que coordinar los hilos cuesta más que el cálculo.
+
+El kernel de Numba, en cambio, ya es 2.3 veces más rápido que torchvision con
+PIL en un solo hilo, y con 20 hilos llega a 12.5 veces. Es la fase que mejor
+escala en CPU porque cada lote es un solo `prange` grande, sin barreras
+intermedias.
+
+: Decodificación de 5,800 imágenes en la Ryzen.
+
+{{< include ../informe/tablas/cpu2_prep.md >}}
+
+![Speedup de la decodificación en la Ryzen.](../informe/figuras/cpu2_prep_escalamiento.png){width=70%}
+
+La decodificación escala bien hasta 4 procesos (3.0×, eficiencia 0.75) y
+llega a su máximo con 8 (3.9×). Con 20 procesos baja a 2.7×. Karp-Flatt
+crece de forma sostenida, de 0.055 con 2 procesos a 0.33 con 20: el límite no
+es una parte secuencial del algoritmo sino el costo de paralelizar. A partir
+de 10 procesos se empiezan a usar los hilos lógicos (dos por núcleo físico,
+que comparten unidades de cálculo) y 6 de los 10 núcleos son Zen 5c, de menor
+frecuencia. Además, 5,800 imágenes se reparten en bloques muy pequeños entre
+20 procesos, y arrancar cada uno pesa. Con el dataset completo sí conviene usar
+todos: `asl-cuda prep` armó la caché de las 66,700 imágenes en 73.5 s con un
+proceso y en 15.8 s con 20 (4.65×). Parte de esa diferencia no es
+paralelismo: la corrida de un proceso fue la primera y leyó los JPEG desde el
+disco (907 imágenes por segundo, contra 1,686 en la medición con
+calentamiento).
+
+Los hilos, con el mismo código, fueron más lentos que la versión secuencial:
+speedup de 0.51 con 10 hilos. Es el efecto del GIL.
+
+![Uso de cada núcleo lógico durante todas las mediciones en la Ryzen. Las variantes secuenciales ocupan un núcleo a la vez (el sistema lo va moviendo); las paralelas, los 20.](../informe/figuras/cpu2_monitor_bench.png){width=95%}
+
+## 2.4 Resultados en la MacBook de Hansel (Apple M3)
 
 En la M3 las mediciones se hicieron con algunas aplicaciones abiertas en
 segundo plano. El monitor lo muestra: aun en la variante de un solo hilo, los
 cuatro núcleos de eficiencia estaban entre 12 y 28 % ocupados. Por eso usamos
-estos números para comparar cómo escala cada fase y no como tiempos absolutos.
+estos números para comparar cómo escala cada fase y no como tiempos absolutos;
+la referencia limpia en CPU es la de la sección anterior.
 
 : Época completa en la M3 (1,160 imágenes, media de 3 repeticiones).
 
-{{< include ../informe/tablas/cpu2_pipeline.md >}}
+{{< include ../informe/tablas/cpu3_pipeline.md >}}
 
 Una época del Lab 3 en un hilo procesa 45.4 imágenes por segundo, y de los
 25.5 s que tarda con 1,160 imágenes solo 1.8 s son lectura y transformación;
@@ -102,18 +187,18 @@ repetición, mientras arrancan los 4 procesos del `DataLoader`.
 
 : Paso de entrenamiento en la M3 (15 lotes de 64).
 
-{{< include ../informe/tablas/cpu2_train.md >}}
+{{< include ../informe/tablas/cpu3_train.md >}}
 
 : Inferencia en la M3, por lotes y de una sola imagen.
 
-{{< include ../informe/tablas/cpu2_inference.md >}}
+{{< include ../informe/tablas/cpu3_inference.md >}}
 
 El paso de entrenamiento confirma que el problema son los hilos de PyTorch:
 con 8 hilos tarda 64.2 s contra 21.9 s con uno (speedup 0.34) y con un CV de
 11 %, contra 2.7 % en un hilo. Para una sola imagen la latencia sube de 16 ms
 a 82 ms.
 
-![Uso de cada núcleo durante la época completa en la M3. Núcleos 0–3: eficiencia; 4–7: rendimiento.](../informe/figuras/cpu2_monitor_bench.png){width=95%}
+![Uso de cada núcleo durante la época completa en la M3. Núcleos 0–3: eficiencia; 4–7: rendimiento.](../informe/figuras/cpu3_monitor_bench.png){width=95%}
 
 La figura explica por qué. Con 8 hilos el uso total del CPU fue de 31 a 33 %
 en promedio, y los núcleos de rendimiento promediaron entre 32 y 59 %: los
@@ -128,7 +213,7 @@ En cambio, el kernel de Numba en CPU sí escala en la misma máquina:
 
 : Transformación de entrada en la M3 (1,160 imágenes).
 
-{{< include ../informe/tablas/cpu2_augment.md >}}
+{{< include ../informe/tablas/cpu3_augment.md >}}
 
 Pasa de 1.58 s con un hilo a 0.44 s con 8 (3.6 veces), y queda 3.8 veces más
 rápido que torchvision con PIL. La diferencia con PyTorch es que el trabajo
@@ -137,9 +222,9 @@ sin una barrera por capa.
 
 : Decodificación de 5,800 imágenes en la M3.
 
-{{< include ../informe/tablas/cpu2_prep.md >}}
+{{< include ../informe/tablas/cpu3_prep.md >}}
 
-![Speedup de la decodificación en la M3.](../informe/figuras/cpu2_prep_escalamiento.png){width=70%}
+![Speedup de la decodificación en la M3.](../informe/figuras/cpu3_prep_escalamiento.png){width=70%}
 
 ![Monitor de actividad de la M3 durante la decodificación con 1 proceso: un solo proceso de Python con 83 % de CPU.](../evidencia/hansel-prep-secuencial.png){width=95%}
 
@@ -162,17 +247,19 @@ escribe 5.2 GB de caché, contra 1.4 GB de cada una de las otras dos.
 Sospechamos que ahí el límite fue la escritura a disco, pero no lo medimos
 por separado.
 
-## 2.4 Factores que influyen en el rendimiento
+## 2.5 Factores que influyen en el rendimiento
 
 **El GIL.** Los hilos de Python no ejecutan código Python al mismo tiempo.
-Pillow suelta el GIL durante parte de la decodificación, por eso en la M3 los
-hilos todavía dieron 1.68 de speedup, pero quedaron por debajo de los
-procesos con el mismo número de trabajadores. [[GPU: speedup de la fila de
-hilos en prep.md de la corrida oficial y comparación con procesos]].
+En la Ryzen, 10 hilos decodificando fueron más lentos que uno solo (0.51×).
+Pillow suelta el GIL durante parte de la decodificación, y en la M3 los hilos
+todavía dieron 1.68×, pero en las dos máquinas quedaron por debajo de los
+procesos. [[GPU: speedup de la fila de hilos en prep.md de la corrida
+oficial y comparación con procesos]].
 
 **Núcleos físicos, lógicos y de distinto tipo.** Dos hilos lógicos de un
-mismo núcleo físico comparten sus unidades de cálculo, y en la M3 la mitad de
-los núcleos son de eficiencia. En los dos casos agregar trabajadores después
+mismo núcleo físico comparten sus unidades de cálculo; en la Ryzen 6 de los
+10 núcleos son Zen 5c, de menor frecuencia, y en la M3 la mitad son de
+eficiencia. En los dos casos agregar trabajadores después
 del número de núcleos rápidos no ayuda y puede empeorar el tiempo, sobre todo
 en PyTorch, que sincroniza todos sus hilos en cada operación.
 
@@ -180,6 +267,10 @@ en PyTorch, que sincroniza todos sus hilos en cada operación.
 *spawn*: cada uno vuelve a importar las librerías. Es un costo fijo que se
 nota con pocas imágenes (Karp-Flatt creciente en la decodificación) y en el
 `DataLoader` del Lab 3, que lo paga al inicio de cada época.
+
+**Temperatura.** Una laptop con todos los núcleos ocupados por mucho tiempo
+baja su frecuencia. Lo vimos en la variante híbrida en la Ryzen (de 6.5 s a
+10.9 s entre repeticiones); por eso reportamos el CV de cada medición.
 
 **Caché del sistema operativo.** La primera lectura de los JPEG viene del
 disco y las siguientes de la memoria. Por eso descartamos la primera
@@ -193,7 +284,8 @@ Numba hace todo en una pasada por píxel, y por eso aun en un hilo es igual o
 más rápido.
 
 **Hilos de PyTorch y *workers* del `DataLoader`.** El Lab 3 se entregó con 4
-*workers* y todos los hilos. Esa combinación pone más trabajadores que núcleos
-y, como se vio en la M3, puede ser más lenta que un solo hilo. En la laptop
+*workers* y todos los hilos. En la Ryzen esa combinación sí ayudó (1.67×),
+pero en la M3 fue 3 veces más lenta que un solo hilo: el resultado depende
+del procesador y no conviene suponerlo. En la laptop
 oficial la diferencia entre "Lab 3 secuencial" y "Lab 3 como se entregó" fue
 [[GPU: speedup de "Lab 3 como se entregó" en pipeline.md]].

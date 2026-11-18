@@ -44,8 +44,8 @@ Contrastamos las hipótesis de la sección 3 con lo medido:
 
 | Hipótesis | Resultado | Evidencia |
 |---|---|---|
-| 1. Eliminar la decodificación repetida reduce el tiempo por época aun sin GPU | [[GPU]] Parcial en la M3: la parte de datos bajó de 1.84 s a 0.36 s por época de 1,160 imágenes, pero la época total no, porque ahí domina la red | `bench_pipeline.csv`, columna `data_seconds` |
-| 2. La decodificación escala casi lineal hasta los núcleos físicos y después se aplana | [[GPU]] En la M3 se aplanó en 4 procesos (1.98×), con Karp-Flatt creciente | `prep.md` |
+| 1. Eliminar la decodificación repetida reduce el tiempo por época aun sin GPU | [[GPU]] Sí en la Ryzen: la época bajó de 25.8 s a 9.4 s (2.75×) y la parte de datos de 5.4 s a 0.45 s. En la M3 la parte de datos también bajó (1.84 s a 0.36 s), pero la época no, por los hilos de PyTorch | `pipeline.md`, `bench_pipeline.csv` (`data_seconds`) |
+| 2. La decodificación escala casi lineal hasta los núcleos físicos y después se aplana | [[GPU]] Se cumple: la Ryzen (10 núcleos físicos) llegó a su máximo con 8 procesos (3.9×) y bajó con 20; la M3 se aplanó en 4 (1.98×). En las dos Karp-Flatt crece con los procesos | `prep.md` |
 | 3. El kernel en GPU es al menos 10 veces más rápido que torchvision/PIL | [[GPU]] | `augment.md` |
 | 4. El paso de entrenamiento en GPU con AMP es más de 10 veces más rápido que en CPU multinúcleo | [[GPU]] | `train.md` |
 | 5. Con la transformación en CPU la GPU queda esperando datos | [[GPU]] | `entrenamientos.md`, `monitor_base-cuda-aug-cpu.png` |
@@ -58,7 +58,8 @@ el backward, organizados en convoluciones y productos matriciales con miles
 de salidas independientes. cuDNN reparte ese trabajo entre todos los
 multiprocesadores de la GPU, y con precisión mixta además usa los Tensor
 Cores. En el CPU el mismo trabajo se reparte entre unos pocos núcleos, y como
-vimos en la M3, repartirlo entre más hilos no siempre ayuda.
+vimos en la sección 2, repartirlo entre más hilos ayuda poco (1.45× con 20
+hilos en la Ryzen) o incluso empeora (0.34× con 8 en la M3).
 
 **El kernel de entrada está limitado por memoria, no por cálculo.** Cada hilo
 hace unas 60 operaciones de punto flotante por 24 bytes que lee y escribe.
@@ -79,11 +80,13 @@ Cuando la transformación vuelve al CPU (ablación `base-cuda-aug-cpu`), el CPU
 es el que marca el ritmo. [[GPU: img/s y espera por datos de las dos
 corridas.]]
 
-**Los hilos de PyTorch en CPU.** En la M3, con 8 hilos, el paso de
-entrenamiento fue 2.9 veces más lento que con uno, y durante la época
-completa el uso total del CPU promedió entre 31 y 33 %. PyTorch divide cada operación en partes iguales y espera a que
-terminen todas; con núcleos de dos velocidades los rápidos esperan a los
-lentos en cada capa. [[GPU: comparar con la fila "CPU N hilos" de train.md
+**Los hilos de PyTorch en CPU.** PyTorch divide cada operación en partes
+iguales y espera a que terminen todas antes de seguir. En la Ryzen, con 20
+hilos, el paso de entrenamiento fue solo 1.45 veces más rápido aunque los 20
+hilos lógicos aparecían al 96 %: buena parte de ese uso es espera activa en
+las barreras de OpenMP. En la M3, con 8 hilos, fue 2.9 veces más lento que con
+uno, con el CPU ocupado apenas entre 31 y 33 %: con núcleos de dos
+velocidades los rápidos esperan a los lentos en cada capa. [[GPU: comparar con la fila "CPU N hilos" de train.md
 en la laptop oficial: si allí sí ayudó, la diferencia es la arquitectura del
 procesador.]]
 
@@ -101,9 +104,10 @@ de un JPEG es secuencial dentro de cada archivo, porque no se sabe dónde
 empieza un símbolo hasta decodificar el anterior, y está llena de ramas; en
 una GPU los hilos de un warp que toman caminos distintos se ejecutan por
 turnos. Lo que sí es paralelo es que los archivos no dependen entre sí, y eso
-es exactamente lo que aprovechan varios procesos del CPU: en la M3 la
-decodificación llegó a 1.98 veces con 4 procesos y en la laptop oficial a
-[[GPU: mejor speedup de prep.md]]. Además, al guardar el resultado en una
+es exactamente lo que aprovechan varios procesos del CPU: la decodificación
+llegó a 3.9 veces con 8 procesos en la Ryzen, a 1.98 con 4 en la M3 y a
+[[GPU: mejor speedup de prep.md]] en la laptop oficial. Con hilos, en cambio,
+fue más lenta que la versión secuencial en la Ryzen (0.51×) por el GIL. Además, al guardar el resultado en una
 caché `uint8`, la decodificación se hace una sola vez: de las 1,911,100
 decodificaciones que hizo la búsqueda del Lab 3 pasamos a 66,700.
 
@@ -186,7 +190,7 @@ mitad "final".]]
 
 : Modelo elegido evaluado con las fotos del equipo.
 
-{{< include ../informe/tablas/cpu2_evaluacion.md >}}
+{{< include ../informe/tablas/cpu3_evaluacion.md >}}
 
 ![Matriz de confusión del modelo elegido en el test interno.](../informe/figuras/confusion_test.png){width=70%}
 
@@ -219,7 +223,8 @@ y solo fue práctica de probar con datos completos gracias a la GPU.
    de bloque.
 5. La red con AMP: speedup del paso y qué optimización aportó más.
 6. La ablación: la GPU espera si el CPU hace la transformación.
-7. Lo que no mejoró: más hilos de PyTorch en CPU (M3) y la latencia de una
+7. Lo que no mejoró: más hilos de PyTorch en CPU (1.45× en la Ryzen, 0.34×
+   en la M3) y la latencia de una
    sola imagen en GPU.
 8. Datos nuevos: macro F1 en test interno, externo final y fotos del
    equipo.]]

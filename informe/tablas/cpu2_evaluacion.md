@@ -1,1 +1,1 @@
-**[[Tabla pendiente: `results/hansel-apple-m3/tablas/evaluacion.md`]]**
+**[[Tabla pendiente: `results/fernando-ryzen-ai9/tablas/evaluacion.md`]]**
