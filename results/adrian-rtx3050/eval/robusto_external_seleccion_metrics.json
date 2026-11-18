@@ -1,0 +1,89 @@
+{
+  "name": "robusto_external_seleccion",
+  "checkpoint": "results/adrian-rtx3050/train/robusto-cuda/model.pt",
+  "device": "cuda",
+  "images": 435,
+  "accuracy": 0.5402298850574713,
+  "balanced_accuracy": 0.5402298850574713,
+  "macro_precision": 0.5727267086327033,
+  "macro_recall": 0.5402298850574713,
+  "macro_f1": 0.5143721236905148,
+  "top3_accuracy": 0.7218390804597701,
+  "log_loss": 1.9510996341705322,
+  "mean_confidence": 0.32136160135269165,
+  "seconds": 0.09805629999027587,
+  "images_per_second": 4436.226943532832,
+  "classes_present": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "DELETE",
+    "NOTHING",
+    "SPACE"
+  ],
+  "top_confusions": [
+    {
+      "actual": "V",
+      "predicted": "K",
+      "count": 12
+    },
+    {
+      "actual": "A",
+      "predicted": "Y",
+      "count": 10
+    },
+    {
+      "actual": "M",
+      "predicted": "N",
+      "count": 10
+    },
+    {
+      "actual": "O",
+      "predicted": "D",
+      "count": 8
+    },
+    {
+      "actual": "S",
+      "predicted": "I",
+      "count": 8
+    },
+    {
+      "actual": "D",
+      "predicted": "U",
+      "count": 7
+    },
+    {
+      "actual": "T",
+      "predicted": "L",
+      "count": 5
+    },
+    {
+      "actual": "X",
+      "predicted": "R",
+      "count": 5
+    }
+  ]
+}

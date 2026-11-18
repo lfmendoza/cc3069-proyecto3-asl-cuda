@@ -1,0 +1,2 @@
+epoch,stage,stage_epoch,train_loss,train_accuracy,val_accuracy,val_macro_f1,val_log_loss,train_seconds,val_seconds,train_images_per_second,data_wait_seconds,lr,trainable_parameters,gpu_peak_memory_mb
+1,head,1,0.6707351831896552,0.8069885057471264,0.9436206896551724,0.9420311776416362,0.18999789655208588,241.85914390001562,44.862075699988054,179.85675173804,32.24758380051935,[1e-06],620573,

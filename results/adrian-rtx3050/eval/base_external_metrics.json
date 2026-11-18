@@ -1,0 +1,89 @@
+{
+  "name": "base_external",
+  "checkpoint": "results/adrian-rtx3050/train/base-cuda/model.pt",
+  "device": "cuda",
+  "images": 870,
+  "accuracy": 0.3896551724137931,
+  "balanced_accuracy": 0.3896551724137931,
+  "macro_precision": 0.4732315990823462,
+  "macro_recall": 0.3896551724137931,
+  "macro_f1": 0.38252017135188926,
+  "top3_accuracy": 0.628735632183908,
+  "log_loss": 4.317582607269287,
+  "mean_confidence": 0.81562739610672,
+  "seconds": 0.44732989999465644,
+  "images_per_second": 1944.873347411815,
+  "classes_present": [
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "DELETE",
+    "NOTHING",
+    "SPACE"
+  ],
+  "top_confusions": [
+    {
+      "actual": "V",
+      "predicted": "K",
+      "count": 24
+    },
+    {
+      "actual": "T",
+      "predicted": "L",
+      "count": 18
+    },
+    {
+      "actual": "M",
+      "predicted": "N",
+      "count": 14
+    },
+    {
+      "actual": "E",
+      "predicted": "J",
+      "count": 12
+    },
+    {
+      "actual": "B",
+      "predicted": "N",
+      "count": 10
+    },
+    {
+      "actual": "R",
+      "predicted": "K",
+      "count": 10
+    },
+    {
+      "actual": "G",
+      "predicted": "H",
+      "count": 10
+    },
+    {
+      "actual": "C",
+      "predicted": "J",
+      "count": 9
+    }
+  ]
+}

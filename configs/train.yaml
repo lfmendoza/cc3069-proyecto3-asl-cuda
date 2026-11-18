@@ -37,7 +37,7 @@ augment:
   eval_crop: 0.875
 cuda:
   amp: true
-  channels_last: true
+  channels_last: false
   cudnn_benchmark: true
   threads_per_block: [16, 16]
   augment_device: gpu      # gpu = kernel Numba CUDA; cpu = kernel Numba en núcleos del CPU
