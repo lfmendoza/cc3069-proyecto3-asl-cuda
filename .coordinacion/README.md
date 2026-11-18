@@ -34,18 +34,13 @@ ejecutado con salidas), informe PDF, capturas y presentación.
 - Hansel: entorno y corrida CPU en la M3 integrados (PR #1).
 - Fernando: corrida CPU limpia de referencia en la Ryzen AI 9 365
   (`results/fernando-ryzen-ai9/`).
-- Informe redactado completo (secciones 1 a 6). Lo que depende de la corrida
-  en GPU está marcado con `[[GPU: ...]]`; las tablas y figuras entran solas
-  con `asl-cuda informe`, que ya corre al final de `scripts/corrida_gpu.ps1`.
-  El PDF compila hoy con avisos de "pendiente" en esos lugares.
-- Notebook entregable armado y probado en CPU.
-- Presentación armada (20 láminas); los datos de GPU se llenan al final.
-- Fotos del equipo: `asl-cuda fotos --persona <nombre>`; su evaluación es un
-  solo script (`scripts/datos_nuevos.*`).
-- **No probado todavía en GPU real.** Es lo primero que hace Adrian. Todo lo
-  que falta depende de su corrida oficial: llenar las marcas `[[...]]`,
-  evaluar las fotos con el modelo final y poner los números en la
-  presentación.
+- Adrian: corrida oficial en la RTX 3050 integrada (PR #2 y commits
+  siguientes): secciones 2, 5 y 6 con números oficiales, evidencia, modelo
+  final y notebook ejecutado en GPU.
+- Informe completo (38 páginas). La única marca que queda es `[[Fotos: ...]]`
+  de la sección 6.5, junto con la tabla de evaluación de las fotos.
+- Presentación (20 láminas) y guiones con los números oficiales; solo falta
+  el dato de las fotos.
 
 ## Reparto
 

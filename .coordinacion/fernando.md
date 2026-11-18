@@ -16,22 +16,20 @@
 - Presentación de 20 láminas con notas (carpeta privada, fuera del repo);
   se regenera con los números de Adrian.
 
+## Hecho con la corrida oficial de Adrian (18/11)
+
+- `pyproject.toml` y `uv.lock`: NumPy < 2.5 y bibliotecas de CUDA 13.0 en
+  `cu130` (lo que Adrian tuvo que fijar a mano).
+- Nota de `channels_last` en la sección 4.5 y menciones corregidas en 3, 4 y
+  el README.
+- Tabla de resultados del README llena.
+- Logs de `results/adrian-rtx3050/logs` en UTF-8 y sin rutas personales; los
+  scripts de PowerShell ya guardan los logs en UTF-8.
+- Presentación con los números oficiales y guiones de los tres llenos.
+
 ## Pendiente
 
-1. **Día 1 · Soporte a Adrian.** Estar disponible mientras Adrian corre
-   `asl-cuda env` y `tests/test_gpu.py`. Si falla algo propio de la GPU
-   (stream externo, interoperabilidad Numba–PyTorch, memoria), el arreglo va
-   en una rama `fernando/fix-gpu-*` con PR, y Adrian vuelve a correr las
-   pruebas antes del merge.
-2. **Revisión de PRs.** Revisar que cada PR toque solo la zona de su autor,
-   que no suba `data/`, `.local/` ni `scratch/`, que los mensajes de commit
-   sigan el formato, y que CI pase. Merge sin squash.
-3. **Día 3 · Llenar las marcas `[[GPU: ...]]` de `docs/02` y `docs/06`**
-   con la corrida de Adrian (`git grep -n "\[\[" docs`), revisar que la
-   sección 4 siga coincidiendo con lo medido (4.3 bloque, 4.4 traslape, 4.6
-   recetas) y llenar la tabla de resultados del `README.md` con `fases.md`,
-   `proyeccion_entrenamiento.md` y `evaluacion.md`.
-4. **Día 4 · Revisión del informe completo** antes de que Hansel compile la
-   versión final: números consistentes entre secciones, mismo equipo para
-   todos los speedup, figuras citadas en el texto.
-5. **Día 5 · Cierre** (ver `cierre.md`).
+1. Cuando Hansel suba las fotos: revisar su PR y el párrafo de 6.5, y poner
+   los aciertos de las fotos en la presentación (`numeros.json`).
+2. **Cierre** (ver `cierre.md`): PDF final, borrar `.coordinacion`, tag
+   `v1.0` y entregar en Canvas el PDF, el notebook y el enlace al repo.
