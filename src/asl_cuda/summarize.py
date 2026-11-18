@@ -18,6 +18,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+import matplotlib.ticker  # noqa: E402,F401
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
@@ -193,7 +194,6 @@ def monitor_figure(path: Path, out: Path, title: str) -> None:
     image = ax.imshow(m[cores].T.to_numpy(float), aspect="auto", cmap="Blues", vmin=0, vmax=100,
                       extent=[m["t"].min(), m["t"].max(), len(cores) - 0.5, -0.5], interpolation="nearest")
     ax.set_ylabel("Núcleo lógico")
-    ax.set_title(title, loc="left")
     ax.grid(False)
     fig.colorbar(image, ax=ax, pad=0.01, label="% uso")
     if has_gpu:
@@ -206,16 +206,17 @@ def monitor_figure(path: Path, out: Path, title: str) -> None:
         ax2.legend(fontsize=8, loc="upper right", ncols=2)
         fig.colorbar(image, ax=ax2, pad=0.01).remove()
     axes[-1, 0].set_xlabel("Tiempo (s)")
-    # marcar cambios de fase
-    changes = list(m.index[m["phase"] != m["phase"].shift()]) + [m.index[-1]]
+    # marcar cada fase una sola vez (las pausas "idle" entre repeticiones no cuentan)
+    spans = m[m["phase"] != "idle"].groupby("phase", sort=False)["t"].agg(["min", "max"])
     span = float(m["t"].max() - m["t"].min()) or 1.0
-    for start, end in zip(changes[:-1], changes[1:], strict=True):
+    for phase, (start, end) in spans.iterrows():
         for a in axes[:, 0]:
-            a.axvline(m.loc[start, "t"], color=MUTED, linewidth=0.5, alpha=0.6)
-        width = float(m.loc[end, "t"] - m.loc[start, "t"])
-        if width / span > 0.08:
-            label = str(m.loc[start, "phase"]).split(":")[-1][:22]
-            ax.text((m.loc[start, "t"] + m.loc[end, "t"]) / 2, -0.7, label, ha="center", va="bottom", fontsize=6.5, color=MUTED)
+            a.axvline(start, color=MUTED, linewidth=0.5, alpha=0.6)
+        if (end - start) / span > 0.08:
+            label = str(phase).split(":")[-1].split("(")[0].strip()[:24]
+            ax.text((start + end) / 2, 1.02, label, transform=ax.get_xaxis_transform(), ha="center", va="bottom",
+                    fontsize=6.5, color=MUTED)
+    ax.set_title(title, loc="left", pad=16)
     fig.tight_layout()
     fig.savefig(out)
     plt.close(fig)
@@ -254,6 +255,144 @@ def confusion_figure(matrix: np.ndarray, out: Path, title: str) -> None:
     fig.tight_layout()
     fig.savefig(out)
     plt.close(fig)
+
+
+PHASES = {
+    # fase: (nombre en la tabla, línea base, variante GPU propuesta o prefijo)
+    "prep": ("Decodificación (fase 1)", "secuencial", None),
+    "augment": ("Transformación de entrada", "torchvision-PIL (Lab 3)", "CUDA kernel 16x16"),
+    "train": ("Paso de entrenamiento", "CPU 1 hilo (secuencial)", "GPU AMP fp16 + channels_last (propuesta)"),
+    "inference": ("Inferencia por lotes", "CPU 1 hilo lote 64", "GPU AMP fp16 lote"),
+    "pipeline": ("Época completa", "Lab 3 secuencial (0 workers, 1 hilo)", "Híbrido GPU, kernel CUDA (propuesta)"),
+}
+
+
+def phase_summary(bench: Path, figures: Path) -> str | None:
+    """Una fila por fase: secuencial, mejor variante en CPU y variante propuesta en GPU."""
+    rows = []
+    for phase, (label, base_name, gpu_name) in PHASES.items():
+        path = bench / f"bench_{phase}.csv"
+        if not path.exists():
+            continue
+        raw = pd.read_csv(path)
+        if "sweep" in raw:
+            raw = raw[raw["sweep"] != True]  # noqa: E712
+        raw = raw[~raw["variant"].str.startswith("H2D") & ~raw["variant"].str.contains(r"\+ H2D")]
+        if phase == "inference":
+            raw = raw[raw["batch"] > 1]
+        if phase == "prep":
+            raw = raw.assign(device="cpu")
+        t = aggregate(raw)
+        t["ms_img"] = 1000 * t["mean_s"] / t["images"]
+        base = t[t["variant"] == base_name]
+        if base.empty:
+            continue
+        cpu = t[(t["family"] == "cpu") & ~t["variant"].str.startswith("hilos")]
+        gpu = t[t["variant"].str.startswith(gpu_name)] if gpu_name else t.iloc[0:0]
+        b = float(base["ms_img"].iloc[0])
+        row = {"phase": label, "seq": b, "cpu_variant": "", "cpu": float("nan"), "cpu_s": float("nan"),
+               "gpu": float("nan"), "gpu_s": float("nan")}
+        if not cpu.empty:
+            best = cpu.loc[cpu["ms_img"].idxmin()]
+            row.update(cpu_variant=str(best["variant"]), cpu=float(best["ms_img"]), cpu_s=b / float(best["ms_img"]))
+        if not gpu.empty:
+            g = float(gpu["ms_img"].iloc[0])
+            row.update(gpu=g, gpu_s=b / g)
+        rows.append(row)
+    if not rows:
+        return None
+    table = pd.DataFrame(rows)
+
+    fig, ax = plt.subplots(figsize=(6.4, 0.55 * len(table) + 1.1))
+    y = np.arange(len(table))[::-1]
+    h = 0.36
+    # barras desde 1×: a la derecha si la variante es más rápida, a la izquierda si es más lenta
+    for column, offset, family in (("cpu_s", h / 2, "cpu"), ("gpu_s", -h / 2, "gpu")):
+        values = table[column].to_numpy(float)
+        ax.barh(y + offset, values - 1, left=1, height=h, color=COLORS[family], label=LABELS[family],
+                edgecolor="white", linewidth=2)
+        for yy, value in zip(y, values, strict=True):
+            if np.isfinite(value):
+                ax.text(value * (1.08 if value >= 1 else 0.92), yy + offset, f"{value:.1f}×", va="center",
+                        ha="left" if value >= 1 else "right", fontsize=7.5, color=INK)
+    ax.axvline(1, color=MUTED, linewidth=1)
+    ax.set_xscale("log")
+    ax.xaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}×"))
+    ax.set_yticks(y, table["phase"])
+    ax.set_xlabel("Speedup respecto a la versión secuencial (escala logarítmica)")
+    ax.set_title("Speedup por fase en el mismo equipo", loc="left", pad=22)
+    ax.legend(loc="lower left", bbox_to_anchor=(0, 1.0), ncols=2, fontsize=8)
+    finite = table[["cpu_s", "gpu_s"]].to_numpy(float)
+    finite = finite[np.isfinite(finite)]
+    ax.set_xlim(min(0.5, finite.min() / 2) if finite.size else 0.5, max(4.0, finite.max() * 2.5) if finite.size else 10)
+    fig.tight_layout()
+    fig.savefig(figures / "speedup_fases.png")
+    plt.close(fig)
+
+    return to_markdown(table, {"phase": "Fase", "seq": "Secuencial (ms/img)", "cpu_variant": "Mejor variante CPU",
+                               "cpu": "CPU (ms/img)", "cpu_s": "Speedup CPU", "gpu": "GPU (ms/img)",
+                               "gpu_s": "Speedup GPU"})
+
+
+def training_table(train_dir: Path) -> str | None:
+    """Una fila por entrenamiento: tiempo, rendimiento, espera por datos y calidad."""
+    rows = []
+    for path in sorted(train_dir.glob("*/summary.json")):
+        s = json.loads(path.read_text(encoding="utf-8"))
+        hist = pd.read_csv(path.parent / "history.csv")
+        train_s = float(hist["train_seconds"].sum())
+        device = "GPU" if s["device"].startswith("cuda") else "CPU"
+        detail = [device]
+        if s.get("amp"):
+            detail.append("AMP")
+        if device == "GPU":
+            detail.append(f"aumentación en {s.get('augment_device', 'gpu').upper()}")
+        else:
+            detail.append(f"{s.get('torch_threads')} hilos")
+        mem = pd.to_numeric(hist["gpu_peak_memory_mb"], errors="coerce").max()
+        rows.append({"run": path.parent.name, "detail": ", ".join(detail), "epochs": int(s["epochs_run"]),
+                     "epoch_s": float(hist["train_seconds"].mean()), "img_s": float(hist["train_images_per_second"].mean()),
+                     "wait_pct": 100 * float(hist["data_wait_seconds"].sum()) / train_s if train_s else float("nan"),
+                     "total_min": float(s["total_seconds"]) / 60, "f1": float(s["validation"]["macro_f1"]),
+                     "mem_mb": float(mem) if pd.notna(mem) else float("nan")})
+    if not rows:
+        return None
+    return to_markdown(pd.DataFrame(rows), {
+        "run": "Corrida", "detail": "Configuración", "epochs": "Épocas", "epoch_s": "s por época (train)",
+        "img_s": "Imágenes/s", "wait_pct": "Espera por datos (%)", "total_min": "Total (min)",
+        "f1": "Macro F1 validación", "mem_mb": "Memoria GPU pico (MB)"})
+
+
+def evaluation_table(eval_dir: Path) -> str | None:
+    """Métricas de cada evaluación guardada en results/<tag>/eval."""
+    rows = []
+    for path in sorted(eval_dir.glob("*_metrics.json")):
+        m = json.loads(path.read_text(encoding="utf-8"))
+        rows.append({"name": m["name"], "images": int(m["images"]), "accuracy": float(m["accuracy"]),
+                     "f1": float(m["macro_f1"]), "top3": float(m["top3_accuracy"])})
+    if not rows:
+        return None
+    return to_markdown(pd.DataFrame(rows), {"name": "Conjunto", "images": "Imágenes", "accuracy": "Exactitud",
+                                             "f1": "Macro F1", "top3": "Top-3"})
+
+
+def _prep_seconds(logs: Path) -> float | None:
+    """Tiempo de la fase 1 en este equipo, leído de sus propios logs de `prep`.
+
+    Se usa el log con más procesos (la variante paralela). Leerlo de los logs y
+    no de data/cache evita mezclar el tiempo de otra computadora al resumir.
+    """
+    import re
+
+    best: tuple[int, float] | None = None
+    for log in sorted(logs.glob("*prep*.log")) if logs.exists() else []:
+        found = re.findall(r"caché ([\d.]+)s, [\d.]+ img/s, (\d+) procesos", log.read_text(encoding="utf-8", errors="ignore"))
+        if found:
+            procs = max(int(p) for _, p in found)
+            total = sum(float(t) for t, _ in found)
+            if best is None or procs > best[0]:
+                best = (procs, total)
+    return best[1] if best else None
 
 
 def summarize(tag: str, cpu_tag: str | None = None) -> None:
@@ -321,8 +460,8 @@ def summarize(tag: str, cpu_tag: str | None = None) -> None:
         per_image = dict(zip(t["variant"], t["mean_s"] / t["images"], strict=True))
         train_images = 43500
         epochs = 14
-        prep_seconds = None
-        if prep_report.exists():
+        prep_seconds = _prep_seconds(base / "logs")
+        if prep_seconds is None and prep_report.exists():
             prep_seconds = sum(s["seconds"] for s in json.loads(prep_report.read_text())["splits"].values() if not s.get("reused"))
         rows = []
         for variant, spi in per_image.items():
@@ -338,11 +477,19 @@ def summarize(tag: str, cpu_tag: str | None = None) -> None:
             to_markdown(proj, {"variant": "Variante", "epoch_min": "Min por época", "total_h": "Horas totales", "speedup": "Speedup"}) + note,
             encoding="utf-8")
 
+    if (md := phase_summary(bench, figures)):
+        (tables / "fases.md").write_text(md, encoding="utf-8")
+
     monitor_figure(bench / "monitor.csv", figures / "monitor_bench.png", "Uso de recursos durante las mediciones")
     for run_dir in sorted((base / "train").glob("*")) if (base / "train").exists() else []:
         if (run_dir / "history.csv").exists():
             training_figure(run_dir / "history.csv", figures / f"entrenamiento_{run_dir.name}.png")
         monitor_figure(run_dir / "monitor.csv", figures / f"monitor_{run_dir.name}.png", f"Recursos durante el entrenamiento ({run_dir.name})")
+
+    if (base / "train").exists() and (md := training_table(base / "train")):
+        (tables / "entrenamientos.md").write_text(md, encoding="utf-8")
+    if (base / "eval").exists() and (md := evaluation_table(base / "eval")):
+        (tables / "evaluacion.md").write_text(md, encoding="utf-8")
 
     for matrix_path in sorted((base / "eval").glob("*_confusion.npy")) if (base / "eval").exists() else []:
         name = matrix_path.name.removesuffix("_confusion.npy")
