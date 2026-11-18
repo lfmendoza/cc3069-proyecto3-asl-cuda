@@ -39,8 +39,9 @@ partes:
    donde se necesita.
 2. **La red neuronal (operaciones 11–14).** Forward, backward y optimizador
    se ejecutan en la GPU con PyTorch, que llama a cuDNN y cuBLAS. Encima
-   activamos precisión mixta (fp16 en Tensor Cores), el layout
-   `channels_last` y `cudnn.benchmark`.
+   activamos precisión mixta (fp16 en Tensor Cores) y `cudnn.benchmark`.
+   También probamos el layout `channels_last`, que en esta red resultó más
+   lento (sección 5.3).
 
 ## Lo que no conviene llevar a la GPU
 

@@ -17,7 +17,7 @@ ProcessPoolExecutor (N procesos)                       v
   -> EXIF -> RGB -> escribir en memmap                 v
             |                               kernel Numba: homografía + bilineal +
             v                               color + normalización + borrado
-data/cache/<split>_200.images.npy             -> tensor float32 channels_last (38.5 MB)
+data/cache/<split>_200.images.npy             -> tensor float32 en la GPU (38.5 MB)
   uint8, N x 200 x 200 x 3                             |
   + labels, sha256 y meta.json                         v
                                             MobileNetV3 forward/backward fp16 (cuDNN)
@@ -41,9 +41,11 @@ comunicación.
 map) y escribe en sus filas. Al proceso principal solo regresan los hashes,
 errores y tiempos, unos cientos de bytes por bloque.
 
-**Por qué procesos y no hilos:** lo probamos. Con el mismo código y 10 hilos
-la decodificación de 5,800 imágenes tardó 6.6 s contra 3.5 s secuencial
-(speedup 0.53); con 8 procesos tardó 0.82 s (speedup 4.3). Pillow libera el
+**Por qué procesos y no hilos:** lo probamos (sección 2). En la Ryzen, con
+el mismo código y 10 hilos, la decodificación de 5,800 imágenes tardó 6.7 s
+contra 3.4 s secuencial (speedup 0.51); con 8 procesos tardó 0.88 s
+(speedup 3.9). En la laptop oficial los hilos quedaron más cerca (1.80× con
+4 hilos contra 2.10× con 4 procesos), pero tampoco ganaron. Pillow libera el
 GIL dentro del decodificador, pero todo lo que rodea a cada imagen (abrir el
 archivo, el hash, EXIF, convertir a NumPy, el ciclo en Python) lo retiene, y
 con imágenes de 200 × 200 esa parte pesa tanto como la decodificación misma.
@@ -99,9 +101,9 @@ Por qué 16 × 16:
   multiprocesador tenga varios bloques activos, lo que ayuda a esconder la
   latencia de memoria.
 - Los 16 hilos consecutivos en `x` de un warp leen píxeles vecinos de la
-  fuente y escriben posiciones contiguas en la salida `channels_last`
-  (cada píxel son 3 floats seguidos), así que las escrituras se combinan
-  bien.
+  fuente y escriben posiciones contiguas de la salida (en cada plano de
+  color con el formato NCHW final; con `channels_last`, cada píxel son 3
+  floats seguidos), así que las escrituras se combinan bien.
 - Un bloque cuadrado mantiene juntas en caché las filas de la fuente que
   usan los hilos, aunque haya rotación.
 
@@ -143,7 +145,7 @@ la caché L1/L2 ya aprovecha la localidad de los vecinos.
   −2.1 a 2.6; lo que queda es redondeo de float32). La versión CPU sirve para la variante "todo en CPU" y para la
   ablación.
 - **Sin copia entre Numba y PyTorch.** El tensor de salida lo reserva
-  PyTorch con `memory_format=channels_last` y se le pasa al kernel con
+  PyTorch (en el formato que pida la configuración) y se le pasa al kernel con
   `cuda.as_cuda_array(tensor, sync=False)`. El kernel se lanza en el mismo
   stream que usa PyTorch (`cuda.external_stream`), así que el orden entre el
   kernel y la red está garantizado sin sincronizar el CPU.
@@ -178,9 +180,19 @@ comparación sea justa. Lo que cambia en GPU:
 | Técnica | Qué hace | Por qué ayuda |
 |---|---|---|
 | Precisión mixta (`torch.autocast` fp16 + `GradScaler`) | Convoluciones y matmul en fp16, acumulación y pesos en fp32 | Usa Tensor Cores y reduce a la mitad el tráfico de activaciones. `GradScaler` evita que gradientes pequeños se vuelvan 0 en fp16. |
-| `channels_last` | Activaciones en NHWC | Es el layout que usan los kernels de cuDNN con Tensor Cores; evita transposiciones internas. |
+| `channels_last` (probado, ver nota) | Activaciones en NHWC | Es el layout que usan los kernels de cuDNN con Tensor Cores; evita transposiciones internas. |
 | `cudnn.benchmark` | Prueba algoritmos de convolución la primera vez | Las formas de entrada no cambian, así que se elige el más rápido una vez. |
 | Métricas acumuladas en GPU | Pérdida y aciertos como tensores | Un `.item()` por lote obliga a sincronizar el CPU con la GPU; se hace uno por época. |
+
+**Nota sobre `channels_last`.** Estaba en el diseño por lo que se espera en
+redes con convoluciones densas, pero la medición en la RTX 3050 lo
+contradijo: con MobileNetV3-Small el paso de entrenamiento fue casi 8 veces
+más lento (sección 5.3). Esta red está hecha casi toda de convoluciones
+*depthwise* y de 1 × 1 con pocos canales, y para esas capas cuDNN no eligió
+una versión rápida en NHWC. Por eso la configuración final
+(`configs/train.yaml`) lo deja en `false` y se queda con precisión mixta y
+`cudnn.benchmark`; la opción sigue en el código y el benchmark mide las
+cuatro combinaciones.
 
 ## 4.6 Receta de entrenamiento
 
