@@ -10,6 +10,11 @@
   de la corrida oficial; tablas y figuras automáticas con `asl-cuda informe`.
 - Notebook entregable `notebooks/proyecto3_asl_cuda.ipynb` (probado en CPU).
 - Limpieza de los resultados de Hansel (logs y capturas).
+- Corrida CPU de referencia limpia en la Ryzen (`results/fernando-ryzen-ai9/`).
+- `asl-cuda fotos` y `scripts/datos_nuevos.*` para que la parte de fotos de
+  Hansel sea tomar las fotos y correr un script (probado con 87 fotos).
+- Presentación de 20 láminas con notas (carpeta privada, fuera del repo);
+  se regenera con los números de Adrian.
 
 ## Pendiente
 

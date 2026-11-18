@@ -39,9 +39,13 @@ ejecutado con salidas), informe PDF, capturas y presentación.
   con `asl-cuda informe`, que ya corre al final de `scripts/corrida_gpu.ps1`.
   El PDF compila hoy con avisos de "pendiente" en esos lugares.
 - Notebook entregable armado y probado en CPU.
-- **No probado todavía en GPU real.** Es lo primero que hace Adrian; después
-  de su corrida oficial solo quedan: fotos del equipo (Hansel), llenar las
-  marcas `[[...]]` y la presentación.
+- Presentación armada (20 láminas); los datos de GPU se llenan al final.
+- Fotos del equipo: `asl-cuda fotos --persona <nombre>`; su evaluación es un
+  solo script (`scripts/datos_nuevos.*`).
+- **No probado todavía en GPU real.** Es lo primero que hace Adrian. Todo lo
+  que falta depende de su corrida oficial: llenar las marcas `[[...]]`,
+  evaluar las fotos con el modelo final y poner los números en la
+  presentación.
 
 ## Reparto
 
