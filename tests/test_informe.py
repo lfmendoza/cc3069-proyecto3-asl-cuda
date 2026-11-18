@@ -12,7 +12,7 @@ def _bench(tmp_path):
         "augment": [("torchvision-PIL (Lab 3)", "cpu", 1, 2.0), ("Numba CPU 8 hilos", "cpu", 8, 0.5),
                     ("CUDA kernel 16x16", "cuda", 256, 0.02)],
         "train": [("CPU 1 hilo (secuencial)", "cpu", 1, 20.0), ("CPU 8 hilos", "cpu", 8, 10.0),
-                  ("GPU AMP fp16 + channels_last (propuesta)", "cuda", 8, 0.5)],
+                  ("GPU AMP fp16 (propuesta)", "cuda", 8, 0.5)],
     }
     for phase, variants in rows.items():
         frame = pd.DataFrame([{"phase": phase, "variant": v, "repeat": r, "device": d, "threads": t, "images": 1000,

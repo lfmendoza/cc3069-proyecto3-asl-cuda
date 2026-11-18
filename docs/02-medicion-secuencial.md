@@ -55,10 +55,10 @@ usa.
 {{< include ../informe/tablas/pipeline.md >}}
 
 La versión original del Lab 3 en un solo hilo procesa
-44.0 imágenes por segundo. De cada época, el 26 % del tiempo (7.0 de 26.3 s)
+55.9 imágenes por segundo. De cada época, el 26 % del tiempo (5.5 de 20.8 s)
 se va en leer y transformar imágenes y el resto en la red. Con la
 configuración con la que se entregó (4 *workers* y 8 hilos) la época no baja,
-sube a 33.4 s (0.79×): el tiempo esperando datos pasa de 7.0 a 22.1 s.
+sube a 31.6 s (0.66×): el tiempo esperando datos pasa de 5.5 a 20.5 s.
 
 Si se proyecta linealmente al entrenamiento completo (43,500 imágenes por
 época y el máximo de 14 épocas de la receta), el tiempo queda así:
@@ -76,9 +76,9 @@ Si se proyecta linealmente al entrenamiento completo (43,500 imágenes por
 ![Speedup de la decodificación según el número de procesos en la laptop oficial.](../informe/figuras/prep_escalamiento.png){width=72%}
 
 El speedup se queda bastante por debajo de la línea ideal desde el inicio:
-1.70× con 2 procesos y 2.20× con 4, que son los núcleos físicos de esta
-laptop. De 4 a 8 procesos ya casi no cambia (2.25×), porque los otros 4 son
-hilos lógicos que comparten núcleo. Karp-Flatt crece de 0.18 a 0.27 y a 0.37,
+1.64× con 2 procesos y 2.10× con 4, que son los núcleos físicos de esta
+laptop. De 4 a 8 procesos ya casi no cambia (2.16×), porque los otros 4 son
+hilos lógicos que comparten núcleo. Karp-Flatt crece de 0.22 a 0.30 y a 0.39,
 así que lo que limita es el costo de paralelizar (arrancar procesos con
 *spawn* en Windows y competir por el disco), no una parte serial del
 algoritmo.
@@ -260,9 +260,9 @@ por separado.
 En la Ryzen, 10 hilos decodificando fueron más lentos que uno solo (0.51×).
 Pillow suelta el GIL durante parte de la decodificación, y en la M3 los hilos
 todavía dieron 1.68×, pero en las dos máquinas quedaron por debajo de los
-procesos. En la laptop oficial, con Windows, 4 hilos dieron 2.03× contra 2.20× con 4
-procesos: la diferencia es pequeña porque Pillow suelta el GIL dentro del
-decodificador, pero los procesos siguen ganando.
+procesos. En la laptop oficial, con Windows, 4 hilos dieron 1.80× contra 2.10× con 4
+procesos: Pillow suelta el GIL dentro del decodificador y por eso los hilos
+no quedan tan atrás, pero los procesos siguen ganando.
 
 **Núcleos físicos, lógicos y de distinto tipo.** Dos hilos lógicos de un
 mismo núcleo físico comparten sus unidades de cálculo; en la Ryzen 6 de los
@@ -283,12 +283,16 @@ baja su frecuencia. Lo vimos en la variante híbrida en la Ryzen (de 6.5 s a
 **Caché del sistema operativo.** La primera lectura de los JPEG viene del
 disco y las siguientes de la memoria. Por eso descartamos la primera
 ejecución de cada variante: sin calentamiento, la variante que corre primero
-sale perjudicada. En la laptop oficial lo vimos de la peor forma: la primera
-vez que corrimos el benchmark, justo después de escribir la caché completa
-(~8 GB), Windows todavía estaba bajando esos datos al disco y las 5
-repeticiones secuenciales de la decodificación variaron entre 6.4 y 28 s
-(salía un speedup imposible de 7.4× con 2 procesos). Repetimos la fase con el
-disco libre y la desviación bajó a 0.14 s.
+sale perjudicada. En la laptop oficial el disco nos dio dos problemas más.
+Primero, la versión secuencial de la decodificación medía también un `flush()`
+de los ~700 MB del archivo de salida, que las versiones con procesos no hacen;
+sus repeticiones variaron entre 4 y 31 s y salía un speedup imposible de 7.4×
+con 2 procesos. Movimos el `flush()` fuera del tiempo medido en `prep.py`,
+para que las dos variantes midan lo mismo, y la desviación bajó a 0.13 s.
+Segundo, al reconstruir la caché con 8 procesos y la RAM al 98 %, 2,294
+imágenes de la partición de prueba quedaron en negro sin ningún error; se
+notó porque todas daban la misma predicción con la misma confianza. La
+reconstruimos con un proceso y repetimos la evaluación (sección 6.5).
 
 **PIL procesa una imagen a la vez.** La transformación de entrada del Lab 3
 hace varias pasadas completas sobre cada imagen (recorte, rotación,
@@ -301,7 +305,7 @@ más rápido.
 pero en la M3 fue 3 veces más lenta que un solo hilo: el resultado depende
 del procesador y no conviene suponerlo. En la laptop
 oficial la diferencia entre "Lab 3 secuencial" y "Lab 3 como se entregó" fue
-0.79×: 33.4 s contra 26.3 s, más lento que la versión secuencial, como en
+0.66×: 31.6 s contra 20.8 s, más lento que la versión secuencial, como en
 la M3. Con 8 hilos lógicos, los 4 *workers* y los 8 hilos de PyTorch se
 pelean los mismos núcleos, y en Windows los *workers* se vuelven a crear al
 inicio de cada época.

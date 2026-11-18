@@ -1,31 +1,32 @@
 {
   "tag": "adrian-rtx3050",
-  "prep_best_speedup": 2.2464750612438964,
+  "prep_best_speedup": 2.1600085409162393,
   "augment_speedups": {
     "torchvision-PIL (Lab 3)": 1.0,
-    "Numba CPU 1 hilo": 1.93,
-    "Numba CPU 8 hilos": 10.16,
-    "CUDA kernel 8x8": 875.83,
-    "CUDA kernel 16x8": 853.81,
-    "CUDA kernel 16x16": 833.89,
-    "CUDA kernel 32x8": 842.57,
-    "CUDA kernel 32x16": 124.15,
-    "CUDA kernel 32x32": 108.28,
-    "CUDA kernel + H2D + D2H": 59.17
+    "Numba CPU 1 hilo": 1.69,
+    "Numba CPU 8 hilos": 8.01,
+    "CUDA kernel 8x8": 626.96,
+    "CUDA kernel 16x8": 645.46,
+    "CUDA kernel 16x16": 646.84,
+    "CUDA kernel 32x8": 644.47,
+    "CUDA kernel 32x16": 50.64,
+    "CUDA kernel 32x32": 550.37,
+    "CUDA kernel + H2D + D2H": 43.67
   },
   "train_speedups": {
     "CPU 1 hilo (secuencial)": 1.0,
-    "CPU 8 hilos": 2.03,
-    "GPU fp32": 33.03,
-    "GPU fp32 + cudnn.benchmark": 32.63,
-    "GPU fp32 + channels_last": 4.2,
-    "GPU AMP fp16 + channels_last (propuesta)": 4.87
+    "CPU 8 hilos": 1.93,
+    "GPU fp32": 27.8,
+    "GPU fp32 + cudnn.benchmark": 27.84,
+    "GPU fp32 + channels_last": 3.5,
+    "GPU AMP fp16 + channels_last": 4.06,
+    "GPU AMP fp16 (propuesta)": 37.13
   },
   "pipeline_speedups": {
     "Lab 3 secuencial (0 workers, 1 hilo)": 1.0,
-    "Lab 3 como se entreg\u00f3 (4 workers, 8 hilos)": 0.79,
-    "H\u00edbrido CPU (cach\u00e9 + Numba CPU, 8 hilos)": 2.86,
-    "H\u00edbrido GPU, aumentaci\u00f3n en CPU": 5.66,
-    "H\u00edbrido GPU, kernel CUDA (propuesta)": 6.64
+    "Lab 3 como se entreg\u00f3 (4 workers, 8 hilos)": 0.66,
+    "H\u00edbrido CPU (cach\u00e9 + Numba CPU, 8 hilos)": 2.32,
+    "H\u00edbrido GPU, aumentaci\u00f3n en CPU": 15.81,
+    "H\u00edbrido GPU, kernel CUDA (propuesta)": 39.38
   }
 }

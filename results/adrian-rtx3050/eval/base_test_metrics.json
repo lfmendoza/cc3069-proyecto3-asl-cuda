@@ -3,16 +3,16 @@
   "checkpoint": "results/adrian-rtx3050/train/base-cuda/model.pt",
   "device": "cuda",
   "images": 11600,
-  "accuracy": 0.7812931034482758,
-  "balanced_accuracy": 0.7812931034482758,
-  "macro_precision": 0.8774096103972961,
-  "macro_recall": 0.7812931034482758,
-  "macro_f1": 0.7841662384493652,
-  "top3_accuracy": 0.848448275862069,
-  "log_loss": 2.165695905685425,
-  "mean_confidence": 0.9867802858352661,
-  "seconds": 6.405062900012126,
-  "images_per_second": 1811.0673042692583,
+  "accuracy": 0.9539655172413793,
+  "balanced_accuracy": 0.9539655172413792,
+  "macro_precision": 0.9618729926555206,
+  "macro_recall": 0.9539655172413792,
+  "macro_f1": 0.9520587771226323,
+  "top3_accuracy": 0.9989655172413793,
+  "log_loss": 0.19566741585731506,
+  "mean_confidence": 0.9835979342460632,
+  "seconds": 5.086636099993484,
+  "images_per_second": 2280.4855255941857,
   "classes_present": [
     "A",
     "B",
@@ -46,44 +46,44 @@
   ],
   "top_confusions": [
     {
-      "actual": "SPACE",
-      "predicted": "NOTHING",
-      "count": 400
-    },
-    {
-      "actual": "S",
-      "predicted": "NOTHING",
-      "count": 356
-    },
-    {
-      "actual": "T",
-      "predicted": "NOTHING",
-      "count": 347
-    },
-    {
-      "actual": "R",
-      "predicted": "NOTHING",
-      "count": 325
-    },
-    {
-      "actual": "Q",
-      "predicted": "NOTHING",
-      "count": 294
-    },
-    {
-      "actual": "U",
-      "predicted": "NOTHING",
-      "count": 192
-    },
-    {
-      "actual": "P",
-      "predicted": "NOTHING",
-      "count": 188
-    },
-    {
       "actual": "X",
       "predicted": "S",
       "count": 184
+    },
+    {
+      "actual": "R",
+      "predicted": "U",
+      "count": 101
+    },
+    {
+      "actual": "M",
+      "predicted": "N",
+      "count": 54
+    },
+    {
+      "actual": "X",
+      "predicted": "V",
+      "count": 30
+    },
+    {
+      "actual": "U",
+      "predicted": "V",
+      "count": 24
+    },
+    {
+      "actual": "J",
+      "predicted": "I",
+      "count": 20
+    },
+    {
+      "actual": "H",
+      "predicted": "G",
+      "count": 15
+    },
+    {
+      "actual": "T",
+      "predicted": "L",
+      "count": 11
     }
   ]
 }

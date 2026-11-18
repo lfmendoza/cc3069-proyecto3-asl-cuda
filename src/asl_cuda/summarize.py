@@ -268,7 +268,7 @@ PHASES = {
     # fase: (nombre en la tabla, línea base, variante GPU propuesta o prefijo)
     "prep": ("Decodificación (fase 1)", "secuencial", None),
     "augment": ("Transformación de entrada", "torchvision-PIL (Lab 3)", "CUDA kernel 16x16"),
-    "train": ("Paso de entrenamiento", "CPU 1 hilo (secuencial)", "GPU AMP fp16 + channels_last (propuesta)"),
+    "train": ("Paso de entrenamiento", "CPU 1 hilo (secuencial)", "GPU AMP fp16 (propuesta)"),
     "inference": ("Inferencia por lotes", "CPU 1 hilo lote 64", "GPU AMP fp16 lote"),
     "pipeline": ("Época completa", "Lab 3 secuencial (0 workers, 1 hilo)", "Híbrido GPU, kernel CUDA (propuesta)"),
 }

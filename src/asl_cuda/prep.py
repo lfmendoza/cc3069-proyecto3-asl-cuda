@@ -108,13 +108,18 @@ def decode_to_npy(paths: Sequence[str], target: Path, size: int, workers: int, c
     if workers == 1:
         _init_worker(str(target), size)
         results = [_decode_chunk(task) for task in tasks]
+        # El tiempo se toma antes del flush: los procesos del pool tampoco fuerzan la
+        # escritura a disco, y así las dos variantes miden lo mismo (decodificar y
+        # escribir en memoria). Con el flush adentro, la versión secuencial cargaba
+        # además ~700 MB de escritura síncrona y su tiempo dependía del disco.
+        elapsed = time.perf_counter() - started
         assert _TARGET is not None
         _TARGET.flush()
         _TARGET = None
     else:
         with ProcessPoolExecutor(max_workers=workers, initializer=_init_worker, initargs=(str(target), size)) as pool:
             results = list(pool.map(_decode_chunk, tasks))
-    elapsed = time.perf_counter() - started
+        elapsed = time.perf_counter() - started
 
     shas = [""] * len(paths)
     busy: dict[int, float] = {}

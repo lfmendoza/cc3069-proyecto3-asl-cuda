@@ -6,7 +6,7 @@
   "physical_cores": 4,
   "logical_cores": 8,
   "ram_gb": 15.7,
-  "device": "cpu",
+  "device": "cuda",
   "gpu": {
     "available": true,
     "name": "NVIDIA GeForce RTX 3050 6GB Laptop GPU",
@@ -26,7 +26,7 @@
     "numpy": "2.4.6",
     "pillow": "13.0.0"
   },
-  "commit": "b863b37",
+  "commit": "249a032",
   "bench_config": {
     "images_per_class": 40,
     "repeats": 5,
@@ -79,7 +79,11 @@
   },
   "images": 1160,
   "phases": [
-    "prep"
+    "prep",
+    "augment",
+    "train",
+    "inference",
+    "pipeline"
   ],
   "quick": false
 }

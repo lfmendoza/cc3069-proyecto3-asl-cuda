@@ -11,8 +11,8 @@
   "top3_accuracy": 0.7264367816091954,
   "log_loss": 1.9347810745239258,
   "mean_confidence": 0.3237912356853485,
-  "seconds": 0.18632829998387024,
-  "images_per_second": 4669.1780050336565,
+  "seconds": 0.16380280000157654,
+  "images_per_second": 5311.264520457688,
   "classes_present": [
     "A",
     "B",

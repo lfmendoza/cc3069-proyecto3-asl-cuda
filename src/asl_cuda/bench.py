@@ -284,8 +284,11 @@ def phase_train(rec: Recorder, cfg: BenchConfig, tcfg: TrainConfig, images: np.n
     torch.set_num_threads(all_threads)
     if device.type != "cuda":
         return
+    # La propuesta original era AMP + channels_last; en la RTX 3050 con MobileNetV3 channels_last
+    # resultó ~8 veces más lento, así que la propuesta final es AMP sin channels_last.
     variants = [("GPU fp32", False, False, False), ("GPU fp32 + cudnn.benchmark", False, False, True),
-                ("GPU fp32 + channels_last", False, True, True), ("GPU AMP fp16 + channels_last (propuesta)", True, True, True)]
+                ("GPU fp32 + channels_last", False, True, True), ("GPU AMP fp16 + channels_last", True, True, True),
+                ("GPU AMP fp16 (propuesta)", True, False, True)]
     for name, amp, cl, bench in variants:
         torch.backends.cudnn.benchmark = bench
         batches = _batches(images, labels, tcfg, cfg.batch_size, cfg.train_batches, device, cl)
@@ -294,9 +297,10 @@ def phase_train(rec: Recorder, cfg: BenchConfig, tcfg: TrainConfig, images: np.n
     torch.backends.cudnn.benchmark = True
     for batch in cfg.gpu_batch_sweep:
         reps = max(1, (cfg.batch_size * cfg.train_batches) // batch)
-        batches = _batches(images, labels, tcfg, batch, min(reps, max(1, len(images) // batch)), device, True)
-        rec.measure("train", f"GPU AMP lote {batch}", _train_variant(tcfg, device, True, True, batches), cfg.repeats,
-                    max(cfg.warmup, 1), device="cuda", batch=batch, amp=True, channels_last=True, sweep=True)
+        cl = tcfg.cuda.channels_last
+        batches = _batches(images, labels, tcfg, batch, min(reps, max(1, len(images) // batch)), device, cl)
+        rec.measure("train", f"GPU AMP lote {batch}", _train_variant(tcfg, device, True, cl, batches), cfg.repeats,
+                    max(cfg.warmup, 1), device="cuda", batch=batch, amp=True, channels_last=cl, sweep=True)
 
 
 def phase_inference(rec: Recorder, cfg: BenchConfig, tcfg: TrainConfig, images: np.ndarray, labels: np.ndarray,
@@ -307,7 +311,7 @@ def phase_inference(rec: Recorder, cfg: BenchConfig, tcfg: TrainConfig, images: 
         configs += [("GPU fp32", device, all_threads, False), ("GPU AMP fp16", device, all_threads, True)]
     for name, dev, threads, amp in configs:
         torch.set_num_threads(threads)
-        cl = dev.type == "cuda"
+        cl = dev.type == "cuda" and tcfg.cuda.channels_last
         model = build_model(tcfg.architecture, pretrained=False).to(dev).eval()
         if cl:
             model = model.to(memory_format=torch.channels_last)
