@@ -3,6 +3,7 @@
 # Uso: bash scripts/corrida_gpu.sh adrian-rtx4060
 set -euo pipefail
 TAG="${1:?Indique el tag del equipo, p. ej. adrian-rtx4060}"
+CPU_TAG="${2:-hansel-apple-m3}"
 export ASL_HOST_TAG="$TAG"
 OUT="results/$TAG"
 mkdir -p "$OUT/logs"
@@ -32,3 +33,4 @@ paso 07-eval-base evaluate --checkpoint "$OUT/train/base-cuda/model.pt" --split 
 paso 08-eval-robusto evaluate --checkpoint "$OUT/train/robusto-cuda/model.pt" --split test external --prefix robusto
 paso 09-select select --runs base robusto
 paso 10-summarize summarize
+paso 11-informe informe --cpu-tag "$CPU_TAG"

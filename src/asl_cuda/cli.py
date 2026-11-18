@@ -188,7 +188,7 @@ def cmd_select(args) -> None:
             raise SystemExit(f"Falta {path.relative_to(ROOT)}: corra evaluate --prefix {run} --split test external")
         scores[run] = json.loads(path.read_text(encoding="utf-8"))
     best = max(scores, key=lambda r: (scores[r]["macro_f1"], scores[r]["accuracy"]))
-    checkpoint = Path(scores[best]["checkpoint"])
+    checkpoint = ROOT / scores[best]["checkpoint"]
     target = ROOT / args.export
     target.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(checkpoint, target)
@@ -234,6 +234,17 @@ def cmd_demo(args) -> None:
     from .demo import run_demo
 
     run_demo(ROOT / args.checkpoint, args.device, args.camera, args.config)
+
+
+def cmd_informe(args) -> None:
+    from .informe import preparar
+
+    faltan = preparar(_tag(args.tag), args.cpu_tag)
+    print("Tablas y figuras copiadas a informe/tablas e informe/figuras")
+    if faltan:
+        print(f"Quedaron {len(faltan)} avisos de pendiente en el PDF:")
+        for item in faltan:
+            print(f"  results/{item}")
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -297,6 +308,11 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--tag")
     p.add_argument("--cpu-tag", help="resultados CPU de otro equipo para comparar escalamiento")
     p.set_defaults(func=cmd_summarize)
+
+    p = sub.add_parser("informe", help="Copia tablas y figuras de results/<tag> al informe")
+    p.add_argument("--tag", help="equipo de la corrida oficial (GPU)")
+    p.add_argument("--cpu-tag", help="segunda computadora (solo CPU)")
+    p.set_defaults(func=cmd_informe)
 
     p = sub.add_parser("demo", help="Reconocimiento en vivo con la cámara")
     p.add_argument("--checkpoint", default="models/asl_mobilenetv3.pt")

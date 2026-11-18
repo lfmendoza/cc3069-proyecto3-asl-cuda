@@ -21,3 +21,5 @@ informe/*_files/
 informe/.quarto/
 .DS_Store
 Thumbs.db
+informe/*.pdf
+informe/*.tex
