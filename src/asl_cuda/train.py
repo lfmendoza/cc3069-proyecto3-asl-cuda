@@ -1,10 +1,11 @@
 """Fase 2: entrenamiento de la red. Mismo código para CPU y GPU.
 
 En GPU se activan las optimizaciones que solo tienen sentido ahí:
-precisión mixta (fp16 en Tensor Cores con GradScaler), layout channels_last
-(lo prefieren las convoluciones de cuDNN con Tensor Cores), cudnn.benchmark
+precisión mixta (fp16 en Tensor Cores con GradScaler), cudnn.benchmark
 (elige el algoritmo de convolución más rápido para estas formas) y lotes
-armados por el kernel Numba sin pasar por el CPU.
+armados por el kernel Numba sin pasar por el CPU. El layout channels_last
+queda como opción de la configuración; con MobileNetV3 en la RTX 3050 resultó
+casi 8 veces más lento, así que está desactivado.
 """
 
 from __future__ import annotations
