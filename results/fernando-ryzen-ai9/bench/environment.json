@@ -1,0 +1,82 @@
+{
+  "host_tag": "fernando-ryzen-ai9",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "cpu": "AMD Ryzen AI 9 365 w/ Radeon 880M",
+  "physical_cores": 10,
+  "logical_cores": 20,
+  "ram_gb": 15.3,
+  "device": "cpu",
+  "gpu": {
+    "available": false,
+    "numba_cuda_available": false
+  },
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "torchvision": "0.29.2+cpu",
+    "numba": "0.68.1",
+    "numba-cuda": "0.30.4",
+    "numpy": "2.5.5",
+    "pillow": "13.0.0"
+  },
+  "commit": "87656d9",
+  "bench_config": {
+    "images_per_class": 40,
+    "repeats": 5,
+    "warmup": 1,
+    "prep_workers": [
+      1,
+      2,
+      4,
+      8,
+      0
+    ],
+    "train_batches": 15,
+    "batch_size": 64,
+    "inference_batches": 20,
+    "latency_samples": 200,
+    "threads_per_block": [
+      [
+        8,
+        8
+      ],
+      [
+        16,
+        8
+      ],
+      [
+        16,
+        16
+      ],
+      [
+        32,
+        8
+      ],
+      [
+        32,
+        16
+      ],
+      [
+        32,
+        32
+      ]
+    ],
+    "gpu_batch_sweep": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "pipeline_repeats": 3,
+    "prep_images_per_class": 200
+  },
+  "images": 1160,
+  "phases": [
+    "prep",
+    "augment",
+    "train",
+    "inference",
+    "pipeline"
+  ],
+  "quick": false
+}

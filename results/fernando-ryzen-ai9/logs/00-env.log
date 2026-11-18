@@ -1,0 +1,25 @@
+{
+  "host_tag": "fernando-ryzen-ai9",
+  "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "python": "3.12.14",
+  "cpu": "AMD Ryzen AI 9 365 w/ Radeon 880M",
+  "physical_cores": 10,
+  "logical_cores": 20,
+  "ram_gb": 15.3,
+  "device": null,
+  "gpu": {
+    "available": false,
+    "numba_cuda_available": false
+  },
+  "packages": {
+    "torch": "2.14.1+cpu",
+    "torchvision": "0.29.2+cpu",
+    "numba": "0.68.1",
+    "numba-cuda": "0.30.4",
+    "numpy": "2.5.5",
+    "pillow": "13.0.0"
+  },
+  "commit": "87656d9"
+}
+
+Sin GPU CUDA visible: solo se pueden correr las variantes CPU.

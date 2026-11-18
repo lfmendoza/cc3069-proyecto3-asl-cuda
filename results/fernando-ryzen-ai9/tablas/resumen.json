@@ -1,0 +1,18 @@
+{
+  "tag": "fernando-ryzen-ai9",
+  "prep_best_speedup": 3.918623924500317,
+  "augment_speedups": {
+    "torchvision-PIL (Lab 3)": 1.0,
+    "Numba CPU 1 hilo": 2.26,
+    "Numba CPU 20 hilos": 12.48
+  },
+  "train_speedups": {
+    "CPU 1 hilo (secuencial)": 1.0,
+    "CPU 20 hilos": 1.45
+  },
+  "pipeline_speedups": {
+    "Lab 3 secuencial (0 workers, 1 hilo)": 1.0,
+    "Lab 3 como se entreg\u00f3 (4 workers, 20 hilos)": 1.66,
+    "H\u00edbrido CPU (cach\u00e9 + Numba CPU, 20 hilos)": 2.75
+  }
+}
