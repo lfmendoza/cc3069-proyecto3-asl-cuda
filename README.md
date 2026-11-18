@@ -13,21 +13,26 @@ Numba CUDA.
 
 ## Resultados
 
-> Se completan con `results/<equipo>/tablas/` después de la corrida oficial en
-> la laptop con GPU. Todas las variantes procesan las mismas imágenes con el
-> mismo modelo.
+Corrida oficial en una laptop con RTX 3050 6 GB Laptop GPU y Ryzen 5 7235HS
+(4 núcleos, 8 hilos), Windows 11. Todas las variantes procesan las mismas
+imágenes con el mismo modelo y cada speedup compara dos variantes en esa
+misma laptop (`results/adrian-rtx3050/tablas/`).
 
 | Fase | Línea base | Mejor variante | Speedup |
 |---|---|---|---:|
-| Preparación de imágenes (CPU) | 1 proceso | N procesos | — |
-| Transformación de entrada | torchvision/PIL (Lab 3) | kernel Numba CUDA | — |
-| Paso de entrenamiento | CPU 1 hilo | GPU AMP + channels_last | — |
-| Época completa | Lab 3 secuencial | Híbrido CPU + GPU | — |
-| Entrenamiento completo (proyección) | Lab 3 en CPU | Híbrido CPU + GPU | — |
+| Decodificación (CPU) | 1 proceso | 8 procesos | 2.16× |
+| Transformación de entrada | torchvision/PIL (Lab 3) | kernel Numba CUDA 16 × 16 | 647× |
+| Paso de entrenamiento | CPU 1 hilo | GPU AMP fp16 | 37.1× |
+| Inferencia por lotes de 64 | CPU 1 hilo | GPU AMP fp16 | 31.1× |
+| Época completa | Lab 3 secuencial (20.8 s) | caché + kernel CUDA + GPU (0.53 s) | 39.4× |
+| Entrenamiento completo (proyección) | Lab 3 secuencial (3.0 h) | caché + kernel CUDA + GPU (5.8 min) | 31.1× |
 
-| Modelo final | Test interno (11,600) | Dataset externo, mitad final (435) |
+| Modelo final (receta robusta) | Test interno (11,600) | Dataset externo, mitad final (435) |
 |---|---:|---:|
-| macro F1 | — | — |
+| macro F1 | 0.982 | 0.504 |
+
+El entrenamiento real de la receta robusta (14 épocas) tomó 7.1 minutos en la
+GPU.
 
 ## Cómo está organizado
 
@@ -39,7 +44,7 @@ src/asl_cuda/
   augment.py        kernel de entrada: homografía + bilineal + color + normalización
                     (Numba CUDA y Numba CPU con la misma función por píxel)
   feeders.py        armado de lotes: buffers pinned, copia asíncrona, kernel en el stream de PyTorch
-  train.py          FASE 2 (GPU): entrenamiento con AMP, channels_last y cudnn.benchmark
+  train.py          FASE 2 (GPU): entrenamiento con AMP (fp16) y cudnn.benchmark
   secuencial.py     versión original del Lab 3, usada como línea base
   bench.py          mediciones por fase (secuencial, CPU paralelo, GPU)
   summarize.py      speedup, eficiencia, Karp-Flatt, tablas y figuras
