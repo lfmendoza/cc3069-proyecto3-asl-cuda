@@ -40,7 +40,7 @@ def evaluate_split(checkpoint: Path, data: CachedSplit, cfg: TrainConfig, device
     present = sorted(set(truth.tolist()))
     metrics = classification_metrics(truth, probs, labels=present)
     matrix = confusion(truth, probs)
-    result = {"name": name, "checkpoint": str(checkpoint), "device": str(device), **metrics,
+    result = {"name": name, "checkpoint": relative(checkpoint), "device": str(device), **metrics,
               "seconds": seconds, "images_per_second": len(truth) / seconds if seconds else None,
               "classes_present": [CLASSES[i] for i in present], "top_confusions": top_confusions(matrix)}
     out_dir.mkdir(parents=True, exist_ok=True)

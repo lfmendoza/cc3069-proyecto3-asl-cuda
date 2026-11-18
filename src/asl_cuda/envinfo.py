@@ -30,7 +30,9 @@ def cpu_name() -> str:
                     if line.startswith("model name"):
                         return line.split(":", 1)[1].strip()
         if system == "Darwin":
-            return subprocess.run(["sysctl", "-n", "machdep.cpu.brand_string"], capture_output=True, text=True).stdout.strip()
+            name = subprocess.run(["sysctl", "-n", "machdep.cpu.brand_string"], capture_output=True, text=True).stdout.strip()
+            if name:
+                return name
     except OSError:
         pass
     return platform.processor() or platform.machine()
