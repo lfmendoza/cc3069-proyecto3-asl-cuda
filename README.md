@@ -43,6 +43,7 @@ src/asl_cuda/
   secuencial.py     versión original del Lab 3, usada como línea base
   bench.py          mediciones por fase (secuencial, CPU paralelo, GPU)
   summarize.py      speedup, eficiencia, Karp-Flatt, tablas y figuras
+  informe.py        copia tablas y figuras de results/ al informe
   monitor.py        uso de CPU por núcleo y de GPU (NVML) durante cada fase
   evaluate.py       test interno, dataset externo y fotos propias
   demo.py           reconocimiento en vivo con la cámara
@@ -99,6 +100,7 @@ uv run --no-sync asl-cuda predict foto1.jpg foto2.jpg
 uv run --no-sync asl-cuda bench --tag <equipo>            # todas las fases
 uv run --no-sync asl-cuda bench --quick --tag <equipo>    # prueba rápida
 uv run --no-sync asl-cuda summarize --tag <equipo>
+uv run --no-sync asl-cuda informe --tag <equipo> --cpu-tag <otro-equipo>   # tablas y figuras al informe
 
 # demostración en vivo
 uv run --no-sync asl-cuda demo
@@ -106,6 +108,17 @@ uv run --no-sync asl-cuda demo
 
 Las corridas completas están en `scripts/corrida_gpu.ps1` (o `.sh`) y
 `scripts/corrida_cpu.ps1` (o `.sh`).
+
+## Informe
+
+El informe se arma con [Quarto](https://quarto.org) a partir de `docs/` (una
+sección por archivo). Las tablas y figuras no se copian a mano: `asl-cuda
+informe` las toma de `results/<equipo>/` y las deja en `informe/tablas/` e
+`informe/figuras/`.
+
+```bash
+quarto render informe/informe.qmd --to pdf
+```
 
 ## Pruebas
 

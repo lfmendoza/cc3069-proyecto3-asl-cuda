@@ -107,7 +107,8 @@ Por qué 16 × 16:
 
 Este valor se eligió por razonamiento; el benchmark lo compara contra 8×8,
 16×8, 32×8, 32×16 y 32×32 (`asl-cuda bench --phases augment`), que es el
-mismo experimento del ejemplo de clase con 128, 256 y 512 hilos.
+mismo experimento del ejemplo de clase con 128, 256 y 512 hilos. El resultado
+está en la sección 5.4.
 
 ### Trabajo por hilo
 
@@ -137,8 +138,9 @@ la caché L1/L2 ya aprovecha la localidad de los vecinos.
 - **Misma función, dos backends.** La matemática por píxel (`_pixel`) se
   compila como función de dispositivo CUDA y también como función de CPU con
   `numba.njit(parallel=True)`. Las pruebas comparan ambas contra una
-  implementación NumPy independiente (`tests/test_kernel.py`, error máximo
-  < 1e-5). La versión CPU sirve para la variante "todo en CPU" y para la
+  implementación NumPy independiente (`tests/test_kernel.py` exige una
+  diferencia máxima menor a 1e-4 sobre valores ya normalizados, que van de
+  −2.1 a 2.6; lo que queda es redondeo de float32). La versión CPU sirve para la variante "todo en CPU" y para la
   ablación.
 - **Sin copia entre Numba y PyTorch.** El tensor de salida lo reserva
   PyTorch con `memory_format=channels_last` y se le pasa al kernel con
@@ -160,7 +162,9 @@ el lote *k*:
 Como todo lo que se encola en la GPU es asíncrono, mientras la GPU ejecuta
 el forward/backward del lote *k* el CPU ya está armando el *k + 1*. El tiempo
 que el CPU pasa armando lotes queda registrado como `data_wait_seconds` en
-el historial de cada época.
+el historial de cada época. Si el traslape funciona, ese tiempo debe ser una fracción
+pequeña de la época; la sección 5.3 lo compara con la variante que hace la
+transformación en el CPU.
 
 Se envían `uint8` de 200 × 200 (7.7 MB por lote) en lugar de `float32` de
 224 × 224 (38.5 MB): **5 veces menos tráfico por PCIe**. El benchmark mide
@@ -211,8 +215,9 @@ ver si la dirección era correcta, evaluando sobre el dataset externo
 | `train-robusto.yaml` | 0.901 | 0.457 |
 
 La mejora existe incluso con tan pocos datos. La comparación con datos
-completos se hace en GPU y se decide con la mitad "selección" del dataset
-externo; la mitad "final" se reporta una sola vez con el modelo elegido.
+completos se hizo en GPU y se decidió con la mitad "selección" del dataset
+externo; la mitad "final" se reporta una sola vez con el modelo elegido
+(sección 6.5).
 
 ## 4.7 Cómo verificamos que el diseño es correcto
 

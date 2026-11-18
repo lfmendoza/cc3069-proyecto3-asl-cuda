@@ -20,8 +20,9 @@ existe en el CPU (sistema de archivos, librerías de decodificación)?
 
 **En el CPU (núcleos múltiples): todo lo que toca archivos.** La
 decodificación se reparte entre procesos. Usamos procesos y no hilos porque
-Pillow retiene el GIL durante buena parte de la decodificación y con hilos el
-speedup se queda cerca de 1. Cada proceso escribe sus imágenes directamente en
+Pillow retiene el GIL durante buena parte de la decodificación; con hilos el
+speedup queda por debajo del de procesos con el mismo número de trabajadores
+(sección 2). Cada proceso escribe sus imágenes directamente en
 un arreglo `uint8` en disco abierto con *memory map*, así que el proceso
 principal no tiene que recibir ni copiar imágenes.
 
