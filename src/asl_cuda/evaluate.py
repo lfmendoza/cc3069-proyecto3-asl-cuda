@@ -53,7 +53,7 @@ def evaluate_split(checkpoint: Path, data: CachedSplit, cfg: TrainConfig, device
     if paths is not None:
         table.insert(0, "path", [relative(Path(p)) for p in paths])
     table.to_csv(out_dir / f"{name}_predictions.csv", index=False)
-    if paths is not None and len(truth) <= 60:
+    if paths is not None and len(truth) <= 90:  # hasta 3 personas x 29 clases
         contact_sheet(data.images, truth, probs, out_dir / f"{name}_predicciones.png", name)
     return result
 
@@ -79,7 +79,7 @@ def contact_sheet(images: np.ndarray, truth: np.ndarray, probs: np.ndarray, path
                      color="#0b0b0b" if ok else "#e34948", fontweight="normal" if ok else "bold")
     hits = int((pred == truth).sum())
     fig.suptitle(f"{title}: {hits}/{n} correctas (rojo = error)", fontsize=9, x=0.01, ha="left")
-    fig.tight_layout()
+    fig.tight_layout(rect=(0, 0, 1, 1 - 0.35 / fig.get_figheight()))
     fig.savefig(path, dpi=160)
     plt.close(fig)
 

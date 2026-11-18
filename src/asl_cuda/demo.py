@@ -91,3 +91,63 @@ def run_demo(checkpoint: Path, device_name: str, camera: int, config: str, windo
             text = ""
     capture.release()
     cv2.destroyAllWindows()
+
+
+def nombre_foto(clase: str) -> str:
+    """A_1.jpg ... Z_1.jpg, del_1.jpg, nothing_1.jpg, space_1.jpg (lo que lee evaluate)."""
+    return f"{clase.lower() if len(clase) > 1 else clase}_1.jpg".replace("delete_", "del_")
+
+
+def capturar_fotos(destino: Path, camera: int) -> None:
+    """Toma una foto por clase con el mismo recuadro que la demo.
+
+    Se guarda solo el recuadro (como en la demo, la mano ocupa el centro).
+    Teclas: espacio = guardar y pasar a la siguiente, b = volver a la
+    anterior, s = saltar, q = salir. Las clases que ya tienen foto se saltan,
+    así que se puede cortar y retomar.
+    """
+    try:
+        import cv2
+    except ImportError as exc:
+        raise SystemExit("Falta OpenCV: uv sync --extra <cpu|cu126|cu130> --extra demo") from exc
+
+    destino.mkdir(parents=True, exist_ok=True)
+    capture = cv2.VideoCapture(camera)
+    if not capture.isOpened():
+        raise SystemExit(f"No se pudo abrir la cámara {camera}")
+    i = 0
+    while i < len(CLASSES):
+        archivo = destino / nombre_foto(CLASSES[i])
+        if archivo.exists():
+            i += 1
+            continue
+        ok, frame = capture.read()
+        if not ok:
+            break
+        frame = cv2.flip(frame, 1)
+        h, w = frame.shape[:2]
+        side = int(min(h, w) * 0.6)
+        x0, y0 = w - side - 20, (h - side) // 2
+        roi = frame[y0:y0 + side, x0:x0 + side].copy()
+        cv2.rectangle(frame, (x0, y0), (x0 + side, y0 + side), (0, 200, 120), 2)
+        cv2.putText(frame, f"Seña: {CLASSES[i]}  ({i + 1}/{len(CLASSES)})", (20, 40), cv2.FONT_HERSHEY_SIMPLEX, 1.0,
+                    (0, 200, 120), 2)
+        cv2.putText(frame, "espacio = guardar   b = anterior   s = saltar   q = salir", (20, h - 20),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        cv2.imshow("Fotos del equipo - CC3069", frame)
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q"):
+            break
+        if key == ord(" "):
+            cv2.imwrite(str(archivo), roi, [cv2.IMWRITE_JPEG_QUALITY, 95])
+            print(f"Guardada {archivo.name}")
+            i += 1
+        elif key == ord("s"):
+            i += 1
+        elif key == ord("b") and i > 0:
+            i -= 1
+            (destino / nombre_foto(CLASSES[i])).unlink(missing_ok=True)
+    capture.release()
+    cv2.destroyAllWindows()
+    faltan = [c for c in CLASSES if not (destino / nombre_foto(c)).exists()]
+    print(f"{len(CLASSES) - len(faltan)}/{len(CLASSES)} fotos en {destino}" + (f"; faltan {faltan}" if faltan else ""))

@@ -91,6 +91,9 @@ uv run --no-sync asl-cuda prep         # manifest, partición y caché (≈ 8 GB
 # entrenamiento (en GPU si está disponible)
 uv run --no-sync asl-cuda train --config configs/train.yaml --tag <equipo>
 
+# fotos propias: una por clase con la cámara (quedan en .local/fotos-equipo/<persona>, no se suben)
+uv run --no-sync asl-cuda fotos --persona <nombre>
+
 # evaluación del modelo final
 uv run --no-sync asl-cuda evaluate --split test external --tag <equipo>
 uv run --no-sync asl-cuda evaluate --split ruta/a/fotos --name fotos-equipo --tag <equipo>
@@ -106,8 +109,10 @@ uv run --no-sync asl-cuda informe --tag <equipo> --cpu-tag <equipo-cpu> [...]   
 uv run --no-sync asl-cuda demo
 ```
 
-Las corridas completas están en `scripts/corrida_gpu.ps1` (o `.sh`) y
-`scripts/corrida_cpu.ps1` (o `.sh`).
+Las corridas completas están en `scripts/corrida_gpu.ps1` (o `.sh`),
+`scripts/corrida_cpu.ps1` (o `.sh`) y `scripts/datos_nuevos.ps1` (o `.sh`),
+que evalúa el modelo final con el test interno, el dataset externo y las
+fotos del equipo.
 
 ## Informe
 

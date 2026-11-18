@@ -236,6 +236,12 @@ def cmd_demo(args) -> None:
     run_demo(ROOT / args.checkpoint, args.device, args.camera, args.config)
 
 
+def cmd_fotos(args) -> None:
+    from .demo import capturar_fotos
+
+    capturar_fotos(ROOT / ".local" / "fotos-equipo" / args.persona, args.camera)
+
+
 def cmd_informe(args) -> None:
     from .informe import preparar
 
@@ -320,6 +326,11 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--device", default="auto")
     p.add_argument("--camera", type=int, default=0)
     p.set_defaults(func=cmd_demo)
+
+    p = sub.add_parser("fotos", help="Toma una foto por clase con la cámara (.local/fotos-equipo/<persona>)")
+    p.add_argument("--persona", required=True)
+    p.add_argument("--camera", type=int, default=0)
+    p.set_defaults(func=cmd_fotos)
 
     args = parser.parse_args(argv)
     args.func(args)

@@ -70,3 +70,12 @@ def test_preparar_numera_las_computadoras_de_referencia(tmp_path, monkeypatch):
     assert "pc-b" in (root / "informe" / "tablas" / "cpu3_prep.md").read_text()
     assert "Tabla pendiente" in (root / "informe" / "tablas" / "train.md").read_text()
     assert any(f.startswith("gpu-x/") for f in faltan)
+
+
+def test_nombres_de_fotos_se_leen_con_su_clase(tmp_path):
+    from asl_cuda.constants import CLASSES
+    from asl_cuda.demo import nombre_foto
+    from asl_cuda.manifest import label_for_file
+
+    for clase in CLASSES:
+        assert label_for_file(tmp_path / "hansel" / nombre_foto(clase)) == clase
