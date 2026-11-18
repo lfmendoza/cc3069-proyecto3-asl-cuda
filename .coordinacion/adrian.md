@@ -186,3 +186,16 @@ nsys profile -o results/$env:ASL_HOST_TAG/nsys/epoca --trace=cuda,osrt uv run --
 No subas el `.nsys-rep` (es pesado); sube una captura de la línea de tiempo a
 `evidencia/07-nsys-timeline.png` donde se vean las copias H2D, el kernel
 `warp_kernel` y las convoluciones encadenadas.
+
+## Último detalle (18/11)
+
+La celda 21 del notebook (entrenamiento de 10 lotes) forzaba `channels_last`
+en la GPU y por eso marcó 25 img/s. Fernando ya corrigió el código para que
+use la configuración; falta volver a ejecutar el notebook (o solo esa celda,
+después de las de arriba) en tu laptop y subirlo con las salidas nuevas:
+
+```powershell
+git pull
+uv run --no-sync jupyter nbconvert --to notebook --execute --inplace notebooks/proyecto3_asl_cuda.ipynb
+git add notebooks/proyecto3_asl_cuda.ipynb; git commit -m "notebook ejecutado en GPU sin channels_last"; git push
+```

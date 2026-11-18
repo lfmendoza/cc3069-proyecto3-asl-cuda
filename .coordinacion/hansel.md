@@ -56,7 +56,7 @@ borra la hoja `fotos-equipo_predicciones.png` y solo se reportan las métricas.
 
 ```bash
 git switch main && git pull && git switch -c hansel/datos-nuevos
-bash scripts/datos_nuevos.sh hansel-apple-m3 <tag-de-adrian>
+bash scripts/datos_nuevos.sh hansel-apple-m3 adrian-rtx3050
 ```
 
 Corre en CPU en un par de minutos: evalúa el modelo final con el test
