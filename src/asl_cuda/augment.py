@@ -70,8 +70,8 @@ def _pixel(src, b, x, y, params, mean, std, out):
 
     hs = src.shape[1]
     ws = src.shape[2]
-    x0 = math.floor(sx)
-    y0 = math.floor(sy)
+    x0 = int(math.floor(sx))
+    y0 = int(math.floor(sy))
     ax = sx - np.float32(x0)
     ay = sy - np.float32(y0)
     xa = min(max(x0, 0), ws - 1)

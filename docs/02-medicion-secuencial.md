@@ -44,7 +44,9 @@ para ver cómo cambia el escalamiento en CPU con otra arquitectura:
 
 ## 2.2 Resultados en la laptop de la corrida oficial
 
-Equipo: [[GPU: modelo de CPU, núcleos físicos/lógicos y RAM de `environment.json`]].
+Equipo: AMD Ryzen 5 7235HS (4 núcleos físicos, 8 lógicos), 15.7 GB de RAM,
+Windows 11, con una NVIDIA RTX 3050 Laptop de 6 GB que en esta sección no se
+usa.
 
 ### Época completa
 
@@ -53,10 +55,10 @@ Equipo: [[GPU: modelo de CPU, núcleos físicos/lógicos y RAM de `environment.j
 {{< include ../informe/tablas/pipeline.md >}}
 
 La versión original del Lab 3 en un solo hilo procesa
-[[GPU: img/s de "Lab 3 secuencial" en pipeline.md]] imágenes por segundo. De
-cada época, [[GPU: % = data_seconds / seconds de "Lab 3 secuencial" en
-bench_pipeline.csv]] del tiempo se va en leer y transformar imágenes y el
-resto en la red.
+44.0 imágenes por segundo. De cada época, el 26 % del tiempo (7.0 de 26.3 s)
+se va en leer y transformar imágenes y el resto en la red. Con la
+configuración con la que se entregó (4 *workers* y 8 hilos) la época no baja,
+sube a 33.4 s (0.79×): el tiempo esperando datos pasa de 7.0 a 22.1 s.
 
 Si se proyecta linealmente al entrenamiento completo (43,500 imágenes por
 época y el máximo de 14 épocas de la receta), el tiempo queda así:
@@ -73,8 +75,13 @@ Si se proyecta linealmente al entrenamiento completo (43,500 imágenes por
 
 ![Speedup de la decodificación según el número de procesos en la laptop oficial.](../informe/figuras/prep_escalamiento.png){width=72%}
 
-[[GPU: 2 o 3 oraciones sobre prep.md: hasta cuántos procesos el speedup sigue
-la línea ideal, dónde se aplana y qué pasa con Karp-Flatt.]]
+El speedup se queda bastante por debajo de la línea ideal desde el inicio:
+1.70× con 2 procesos y 2.20× con 4, que son los núcleos físicos de esta
+laptop. De 4 a 8 procesos ya casi no cambia (2.25×), porque los otros 4 son
+hilos lógicos que comparten núcleo. Karp-Flatt crece de 0.18 a 0.27 y a 0.37,
+así que lo que limita es el costo de paralelizar (arrancar procesos con
+*spawn* en Windows y competir por el disco), no una parte serial del
+algoritmo.
 
 Las variantes en CPU de la transformación de entrada, del paso de
 entrenamiento y de la inferencia están en las tablas de la sección 5.3, junto
@@ -253,8 +260,9 @@ por separado.
 En la Ryzen, 10 hilos decodificando fueron más lentos que uno solo (0.51×).
 Pillow suelta el GIL durante parte de la decodificación, y en la M3 los hilos
 todavía dieron 1.68×, pero en las dos máquinas quedaron por debajo de los
-procesos. [[GPU: speedup de la fila de hilos en prep.md de la corrida
-oficial y comparación con procesos]].
+procesos. En la laptop oficial, con Windows, 4 hilos dieron 2.03× contra 2.20× con 4
+procesos: la diferencia es pequeña porque Pillow suelta el GIL dentro del
+decodificador, pero los procesos siguen ganando.
 
 **Núcleos físicos, lógicos y de distinto tipo.** Dos hilos lógicos de un
 mismo núcleo físico comparten sus unidades de cálculo; en la Ryzen 6 de los
@@ -275,7 +283,12 @@ baja su frecuencia. Lo vimos en la variante híbrida en la Ryzen (de 6.5 s a
 **Caché del sistema operativo.** La primera lectura de los JPEG viene del
 disco y las siguientes de la memoria. Por eso descartamos la primera
 ejecución de cada variante: sin calentamiento, la variante que corre primero
-sale perjudicada.
+sale perjudicada. En la laptop oficial lo vimos de la peor forma: la primera
+vez que corrimos el benchmark, justo después de escribir la caché completa
+(~8 GB), Windows todavía estaba bajando esos datos al disco y las 5
+repeticiones secuenciales de la decodificación variaron entre 6.4 y 28 s
+(salía un speedup imposible de 7.4× con 2 procesos). Repetimos la fase con el
+disco libre y la desviación bajó a 0.14 s.
 
 **PIL procesa una imagen a la vez.** La transformación de entrada del Lab 3
 hace varias pasadas completas sobre cada imagen (recorte, rotación,
@@ -288,4 +301,7 @@ más rápido.
 pero en la M3 fue 3 veces más lenta que un solo hilo: el resultado depende
 del procesador y no conviene suponerlo. En la laptop
 oficial la diferencia entre "Lab 3 secuencial" y "Lab 3 como se entregó" fue
-[[GPU: speedup de "Lab 3 como se entregó" en pipeline.md]].
+0.79×: 33.4 s contra 26.3 s, más lento que la versión secuencial, como en
+la M3. Con 8 hilos lógicos, los 4 *workers* y los 8 hilos de PyTorch se
+pelean los mismos núcleos, y en Windows los *workers* se vuelven a crear al
+inicio de cada época.

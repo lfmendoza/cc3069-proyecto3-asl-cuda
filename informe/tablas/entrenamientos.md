@@ -1,1 +1,1 @@
-**[[Tabla pendiente: `results/adrian-gpu/tablas/entrenamientos.md`]]**
+**[[Tabla pendiente: `results/adrian-rtx3050/tablas/entrenamientos.md`]]**

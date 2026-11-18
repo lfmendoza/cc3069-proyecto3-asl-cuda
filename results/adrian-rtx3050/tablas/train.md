@@ -1,0 +1,8 @@
+| Variante | Imágenes | Tiempo medio (s) | Desv. est. (s) | CV (%) | Imágenes/s | Speedup |
+|---|---:|---:|---:|---:|---:|---:|
+| CPU 1 hilo (secuencial) | 960 | 15.7 | 0.433 | 2.763 | 61.2 | 1.000 |
+| CPU 8 hilos | 960 | 7.732 | 0.289 | 3.742 | 124.2 | 2.027 |
+| GPU fp32 | 960 | 0.475 | 0.001 | 0.195 | 2,022.8 | 33.0 |
+| GPU fp32 + cudnn.benchmark | 960 | 0.480 | 0.015 | 3.111 | 1,998.2 | 32.6 |
+| GPU fp32 + channels_last | 960 | 3.729 | 0.003 | 0.081 | 257.5 | 4.204 |
+| GPU AMP fp16 + channels_last (propuesta) | 960 | 3.218 | 0.008 | 0.248 | 298.3 | 4.871 |

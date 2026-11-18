@@ -43,7 +43,7 @@ def test_cuda_feeder_matches_cpu_feeder(train):
     data = _data()
     common = dict(batch_size=32, out_size=224, augment=cfg.augment, train=train, seed=5)
     gpu = list(CudaFeeder(data, **common, device=torch.device("cuda"), channels_last=True))
-    cpu = list(CpuFeeder(data, **common))
+    cpu = [(x.clone(), y.clone()) for x, y in CpuFeeder(data, **common)]
     assert len(gpu) == len(cpu) == 3
     for (xg, yg), (xc, yc) in zip(gpu, cpu, strict=True):
         assert xg.is_contiguous(memory_format=torch.channels_last)
