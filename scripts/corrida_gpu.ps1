@@ -4,7 +4,7 @@
 # mediciones por fase, dos entrenamientos completos y su evaluación.
 param(
     [Parameter(Mandatory = $true)][string]$Tag,
-    [string]$CpuTag = "hansel-apple-m3",
+    [string[]]$CpuTag = @("fernando-ryzen-ai9", "hansel-apple-m3"),
     [switch]$SinBench,
     [switch]$SinEntrenamiento
 )
@@ -45,7 +45,7 @@ try {
         Paso "09-select" @("select", "--runs", "base", "robusto")
     }
     Paso "10-summarize" @("summarize")
-    Paso "11-informe" @("informe", "--cpu-tag", $CpuTag)
+    Paso "11-informe" (@("informe", "--cpu-tag") + $CpuTag)
 }
 finally {
     Stop-Process -Id $smi.Id -ErrorAction SilentlyContinue

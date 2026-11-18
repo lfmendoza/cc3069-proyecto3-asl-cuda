@@ -311,7 +311,7 @@ def main(argv: list[str] | None = None) -> None:
 
     p = sub.add_parser("informe", help="Copia tablas y figuras de results/<tag> al informe")
     p.add_argument("--tag", help="equipo de la corrida oficial (GPU)")
-    p.add_argument("--cpu-tag", help="segunda computadora (solo CPU)")
+    p.add_argument("--cpu-tag", nargs="+", help="computadoras de referencia sin GPU, en orden (cpu2_, cpu3_, ...)")
     p.set_defaults(func=cmd_informe)
 
     p = sub.add_parser("demo", help="Reconocimiento en vivo con la cámara")

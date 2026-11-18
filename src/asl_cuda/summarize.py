@@ -206,14 +206,21 @@ def monitor_figure(path: Path, out: Path, title: str) -> None:
         ax2.legend(fontsize=8, loc="upper right", ncols=2)
         fig.colorbar(image, ax=ax2, pad=0.01).remove()
     axes[-1, 0].set_xlabel("Tiempo (s)")
-    # marcar cada fase una sola vez (las pausas "idle" entre repeticiones no cuentan)
-    spans = m[m["phase"] != "idle"].groupby("phase", sort=False)["t"].agg(["min", "max"])
+    # marcar cada fase una sola vez (las pausas "idle" entre repeticiones no cuentan); si hay
+    # varias fases del benchmark se etiqueta la fase y no cada variante, para que no se encimen
+    work = m[m["phase"] != "idle"]
+    groups = work["phase"].str.split(":").str[0]
+    by_group = groups.nunique() > 1
+    keys = groups if by_group else work["phase"]
+    spans = work.groupby(keys, sort=False)["t"].agg(["min", "max"])
+    names = {"prep": "decodificación", "augment": "transformación", "train": "entrenamiento",
+             "inference": "inferencia", "pipeline": "época completa"}
     span = float(m["t"].max() - m["t"].min()) or 1.0
-    for phase, (start, end) in spans.iterrows():
+    for key, (start, end) in spans.iterrows():
         for a in axes[:, 0]:
-            a.axvline(start, color=MUTED, linewidth=0.5, alpha=0.6)
-        if (end - start) / span > 0.08:
-            label = str(phase).split(":")[-1].split("(")[0].strip()[:24]
+            a.axvline(start, color=MUTED, linewidth=0.8 if by_group else 0.5, alpha=0.7)
+        if (end - start) / span > 0.06:
+            label = names.get(str(key), str(key)) if by_group else str(key).split(":")[-1].split("(")[0].strip()[:24]
             ax.text((start + end) / 2, 1.02, label, transform=ax.get_xaxis_transform(), ha="center", va="bottom",
                     fontsize=6.5, color=MUTED)
     ax.set_title(title, loc="left", pad=16)

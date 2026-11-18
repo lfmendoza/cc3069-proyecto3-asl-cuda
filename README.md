@@ -100,7 +100,7 @@ uv run --no-sync asl-cuda predict foto1.jpg foto2.jpg
 uv run --no-sync asl-cuda bench --tag <equipo>            # todas las fases
 uv run --no-sync asl-cuda bench --quick --tag <equipo>    # prueba rápida
 uv run --no-sync asl-cuda summarize --tag <equipo>
-uv run --no-sync asl-cuda informe --tag <equipo> --cpu-tag <otro-equipo>   # tablas y figuras al informe
+uv run --no-sync asl-cuda informe --tag <equipo> --cpu-tag <equipo-cpu> [...]   # tablas y figuras al informe
 
 # demostración en vivo
 uv run --no-sync asl-cuda demo

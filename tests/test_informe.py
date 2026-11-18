@@ -56,3 +56,17 @@ def test_anchos_respeta_contenido_y_alineacion():
     assert separador.endswith(":|")
     assert salida.splitlines()[2] == "| Lab 3 secuencial (0 workers) | 1.5 |"
     assert "Nota al pie." in salida
+
+
+def test_preparar_numera_las_computadoras_de_referencia(tmp_path, monkeypatch):
+    root = tmp_path
+    for tag in ("pc-a", "pc-b"):
+        (root / "results" / tag / "tablas").mkdir(parents=True)
+        (root / "results" / tag / "tablas" / "prep.md").write_text(f"| Variante |\n|---|\n| {tag} |\n")
+    monkeypatch.setattr(informe, "ROOT", root)
+    monkeypatch.setattr(informe, "INFORME", root / "informe")
+    faltan = informe.preparar("gpu-x", ["pc-a", "pc-b"])
+    assert "pc-a" in (root / "informe" / "tablas" / "cpu2_prep.md").read_text()
+    assert "pc-b" in (root / "informe" / "tablas" / "cpu3_prep.md").read_text()
+    assert "Tabla pendiente" in (root / "informe" / "tablas" / "train.md").read_text()
+    assert any(f.startswith("gpu-x/") for f in faltan)

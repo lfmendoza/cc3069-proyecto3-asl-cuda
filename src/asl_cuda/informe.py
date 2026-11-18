@@ -25,7 +25,7 @@ FIGURAS_GPU = ["speedup_fases", "prep_escalamiento", "speedup_augment", "speedup
 # Capturas de la corrida oficial (evidencia/README.md).
 EVIDENCIA = ["01-prep-cpu-administrador", "02-secuencial-cpu-administrador", "03-train-gpu-administrador",
              "04-train-nvidia-smi", "05-env", "06-aug-cpu-vs-gpu"]
-# Segunda computadora, solo CPU.
+# Computadoras de referencia, solo CPU (cpu2_, cpu3_, ... en el orden en que se pasan).
 TABLAS_CPU = ["prep", "augment", "train", "inference", "pipeline", "proyeccion_entrenamiento", "evaluacion", "fases"]
 FIGURAS_CPU = ["prep_escalamiento", "monitor_bench"]
 
@@ -96,7 +96,7 @@ def _grupo(tag: str, prefijo: str, tablas: list[str], figuras: list[str]) -> lis
     return faltan
 
 
-def preparar(gpu_tag: str, cpu_tag: str | None) -> list[str]:
+def preparar(gpu_tag: str, cpu_tags: list[str] | None = None) -> list[str]:
     (INFORME / "tablas").mkdir(parents=True, exist_ok=True)
     (INFORME / "figuras").mkdir(parents=True, exist_ok=True)
     faltan = [f"{gpu_tag}/{f}" for f in _grupo(gpu_tag, "", TABLAS_GPU, FIGURAS_GPU)]
@@ -113,8 +113,8 @@ def preparar(gpu_tag: str, cpu_tag: str | None) -> list[str]:
         if not _copiar(ROOT / "evidencia" / f"{nombre}.png", INFORME / "figuras" / f"evidencia_{nombre}.png", True):
             faltan.append(f"../evidencia/{nombre}.png")
 
-    if cpu_tag:
-        faltan += [f"{cpu_tag}/{f}" for f in _grupo(cpu_tag, "cpu2_", TABLAS_CPU, FIGURAS_CPU)]
+    for numero, cpu_tag in enumerate(cpu_tags or [], start=2):
+        faltan += [f"{cpu_tag}/{f}" for f in _grupo(cpu_tag, f"cpu{numero}_", TABLAS_CPU, FIGURAS_CPU)]
         # Hoja de miniaturas de las fotos del equipo (solo si hubo consentimiento y se generó).
         fotos = ROOT / "results" / cpu_tag / "eval" / "fotos-equipo_predicciones.png"
         if fotos.exists():
