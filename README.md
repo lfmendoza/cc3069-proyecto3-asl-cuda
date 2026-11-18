@@ -116,8 +116,8 @@ uv run --no-sync asl-cuda demo
 
 Las corridas completas están en `scripts/corrida_gpu.ps1` (o `.sh`),
 `scripts/corrida_cpu.ps1` (o `.sh`) y `scripts/datos_nuevos.ps1` (o `.sh`),
-que evalúa el modelo final con el test interno, el dataset externo y las
-fotos del equipo.
+que evalúa el modelo final con el test interno, el dataset externo y, si
+existen, fotos propias en `.local/fotos-equipo/`.
 
 ## Informe
 
@@ -142,5 +142,5 @@ ASL_REAL_GPU=1 uv run --no-sync pytest tests/test_gpu.py -v   # con GPU real
 | Integrante | Aporte |
 |---|---|
 | Fernando Mendoza | Algoritmo base (Lab 3), análisis de la solución secuencial, identificación de oportunidades y diseño del algoritmo paralelo; implementación del pipeline y del kernel. |
-| Hansel | Medición de la versión secuencial y CPU multinúcleo, pruebas con datos nuevos (dataset externo y fotos del equipo), notebook, análisis comparativo e informe. |
+| Hansel | Medición de la versión secuencial y CPU multinúcleo, pruebas con datos nuevos (test interno y dataset externo), notebook, análisis comparativo e informe. |
 | Adrian | Ejecución y validación en GPU, experimentos de configuración de hilos/bloques y tamaño de lote, entrenamiento final, evidencia de uso de recursos y sección de implementación CUDA. |

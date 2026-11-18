@@ -1,4 +1,4 @@
-# Pruebas con datos nuevos: test interno, dataset externo y fotos del equipo.
+# Pruebas con datos nuevos: test interno, dataset externo y fotos propias si las hay.
 # Necesita models\asl_mobilenetv3.pt (corrida oficial) y las fotos en
 # .local\fotos-equipo\<persona>\ (asl-cuda fotos --persona <nombre>).
 # Uso:  .\scripts\datos_nuevos.ps1 -Tag hansel-apple-m3 -GpuTag adrian-<gpu>
@@ -22,10 +22,12 @@ function Paso([string]$nombre, [string[]]$argumentos) {
 }
 
 Paso "10-eval-final" @("evaluate", "--split", "test", "external", "--prefix", "final")
-foreach ($persona in Get-ChildItem -Directory $fotos) {
-    Paso "11-fotos-$($persona.Name)" @("evaluate", "--split", $persona.FullName, "--name", "fotos-$($persona.Name)")
+if (Test-Path $fotos) {  # fotos propias, opcionales
+    foreach ($persona in Get-ChildItem -Directory $fotos) {
+        Paso "11-fotos-$($persona.Name)" @("evaluate", "--split", $persona.FullName, "--name", "fotos-$($persona.Name)")
+    }
+    Paso "12-fotos-equipo" @("evaluate", "--split", $fotos, "--name", "fotos-equipo")
 }
-Paso "12-fotos-equipo" @("evaluate", "--split", $fotos, "--name", "fotos-equipo")
 Paso "13-summarize" @("summarize")
 Paso "14-informe" @("informe", "--tag", $GpuTag, "--cpu-tag", "fernando-ryzen-ai9", $Tag)
 Write-Host "`nListo. Resultados en $out\eval" -ForegroundColor Green

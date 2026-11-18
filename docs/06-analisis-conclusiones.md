@@ -196,7 +196,7 @@ Lo limitan varios factores que medimos:
 ## 6.5 Desempeño con datos nuevos
 
 Que el modelo sea rápido de entrenar no sirve si solo funciona con las fotos
-del dataset. Lo probamos en tres niveles:
+del dataset. Lo probamos en dos niveles:
 
 1. **Test interno:** 11,600 imágenes de ventanas de los videos que el modelo
    nunca vio, con la misma persona y el mismo fondo.
@@ -204,8 +204,6 @@ del dataset. Lo probamos en tres niveles:
    manos, fondos e iluminación. Lo partimos en dos mitades por clase. La
    mitad "selección" sirvió para elegir entre las dos recetas y la mitad
    "final" se evaluó una sola vez con el modelo elegido.
-3. **Fotos del equipo:** una foto por clase de cada integrante, tomadas con
-   celular o laptop en el lugar donde estuviéramos.
 
 : Métricas de los dos modelos entrenados en GPU sobre el test interno y el dataset externo.
 
@@ -222,20 +220,25 @@ volvieron a entrenar, porque las particiones de entrenamiento y validación
 estaban bien. En el externo las confusiones más frecuentes del modelo elegido
 fueron V con K, M con N, X con R, S con I y A con Y.
 
-: Modelo elegido evaluado con las fotos del equipo.
-
-{{< include ../informe/tablas/cpu3_evaluacion.md >}}
-
 ![Matriz de confusión del modelo elegido en el test interno.](../informe/figuras/confusion_test.png){width=70%}
 
 ![Matriz de confusión del modelo elegido en la mitad "final" del dataset externo.](../informe/figuras/confusion_externo.png){width=70%}
 
-[[Fotos: 1 párrafo con lo que se vio en `fotos-*_predictions.csv` y
-`top_confusions` de los JSON: qué letras se confunden (en el piloto las más
-frecuentes fueron R con U, N con M, U con V y P con Q: pares de señas que
-solo cambian en la posición de uno o dos dedos), si las
-confusiones de las fotos coinciden con las del test interno, y si los
-errores se concentran en fotos con fondo o luz muy distintos.]]
+En la mitad "final" del externo el modelo acertó 229 de 435 fotos (52.6 %),
+y en el 73 % de los casos la seña correcta estuvo entre sus tres primeras
+opciones. Los errores no se reparten parejo. P, Q, H y L salieron casi
+siempre bien (de 13 a 15 aciertos de 15), mientras que V y S no acertaron
+ninguna, y E, T, O y X solo 2 de 15. La confusión más frecuente, V con K (13
+de 15), es la de dos señas con los mismos dos dedos levantados, en las que
+solo cambia dónde va el pulgar; M con N, S con I y A con Y también son pares
+que se distinguen por la posición de uno o dos dedos sobre el puño. M con N
+aparece igual en el test interno (34 casos), y X, que en el test se
+confundía con S, en el externo se confunde con R: el modelo duda entre las
+mismas familias de señas, pero el fondo y la mano cambian hacia qué lado se
+equivoca. El modelo además "sabe" cuándo duda: la confianza mediana de los
+aciertos fue 0.37 y la de los errores 0.19, así que en una aplicación real
+se podría pedir otra toma cuando la confianza es baja.
+
 
 La diferencia entre el test interno y los datos nuevos es el cambio de
 dominio: el dataset de entrenamiento tiene una sola persona, un solo fondo y

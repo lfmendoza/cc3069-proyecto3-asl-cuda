@@ -26,7 +26,7 @@ FIGURAS_GPU = ["speedup_fases", "prep_escalamiento", "speedup_augment", "speedup
 EVIDENCIA = ["01-prep-cpu-administrador", "02-secuencial-cpu-administrador", "03-train-gpu-administrador",
              "04-train-nvidia-smi", "05-env", "06-aug-cpu-vs-gpu"]
 # Computadoras de referencia, solo CPU (cpu2_, cpu3_, ... en el orden en que se pasan).
-TABLAS_CPU = ["prep", "augment", "train", "inference", "pipeline", "proyeccion_entrenamiento", "evaluacion", "fases"]
+TABLAS_CPU = ["prep", "augment", "train", "inference", "pipeline", "proyeccion_entrenamiento", "fases"]
 FIGURAS_CPU = ["prep_escalamiento", "monitor_bench"]
 
 
