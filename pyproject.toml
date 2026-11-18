@@ -5,7 +5,7 @@ description = "Clasificador de alfabeto ASL acelerado con CUDA (CC3069 Proyecto 
 readme = "README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = [
-  "numpy>=2.1",
+  "numpy>=2.1,<2.5",  # numba-cuda 0.30 usa np.row_stack, que NumPy 2.5 eliminó
   "pandas>=2.2",
   "pillow>=11.0",
   "pyyaml>=6.0",
@@ -24,7 +24,10 @@ dependencies = [
 # incluso en modo simulador; no hace falta GPU para usar este extra.
 cpu = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "cuda-toolkit[cudart]==13.*; sys_platform != 'darwin'"]
 cu126 = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "numba-cuda[cu12]>=0.30"]
-cu130 = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "numba-cuda[cu13]>=0.30"]
+# En cu130 las bibliotecas de CUDA de pip se fijan en 13.0, la misma versión con la que
+# viene compilado PyTorch; con 13.5 el enlazado del kernel (nvJitLink) falla en Windows.
+cu130 = ["torch>=2.10,<2.15", "torchvision>=0.25,<0.30", "numba-cuda[cu13]>=0.30", "cuda-toolkit==13.0.*",
+         "nvidia-nvjitlink==13.0.*"]
 demo = ["opencv-python>=4.10"]
 
 [dependency-groups]
