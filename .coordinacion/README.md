@@ -32,6 +32,8 @@ ejecutado con salidas), informe PDF, capturas y presentación.
   imágenes se arma en 16 s con 20 procesos, un entrenamiento piloto alcanza
   0.91 de macro F1 con solo 150 imágenes por clase.
 - Hansel: entorno y corrida CPU en la M3 integrados (PR #1).
+- Fernando: corrida CPU limpia de referencia en la Ryzen AI 9 365
+  (`results/fernando-ryzen-ai9/`).
 - Informe redactado completo (secciones 1 a 6). Lo que depende de la corrida
   en GPU está marcado con `[[GPU: ...]]`; las tablas y figuras entran solas
   con `asl-cuda informe`, que ya corre al final de `scripts/corrida_gpu.ps1`.
@@ -95,6 +97,7 @@ sus propios números de CPU.
 | `docs/05`, `evidencia/`, `models/`, `scripts/corrida_gpu.*` | Adrian | — |
 | `results/adrian-*/` | Adrian | nadie lo toca |
 | `results/hansel-*/` | Hansel | nadie lo toca |
+| `results/fernando-*/` | Fernando | nadie lo toca |
 | `README.md` | Fernando | tabla de resultados la llena Hansel en su PR final |
 
 Los resultados van en carpetas separadas por equipo (`--tag`), así que dos

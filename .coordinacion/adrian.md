@@ -118,7 +118,7 @@ El último paso del script (`11-informe`) copia tus tablas y figuras a
 `informe/tablas/` e `informe/figuras/`. Como las capturas se guardan
 mientras corre, cuando ya estén todas en `evidencia/` vuelve a correrlo:
 ```powershell
-uv run --no-sync asl-cuda informe --cpu-tag hansel-apple-m3
+uv run --no-sync asl-cuda informe --cpu-tag fernando-ryzen-ai9 hansel-apple-m3
 ```
 Al final imprime lo que todavía falta. Debe decir que no queda nada
 pendiente de `results/<tu-tag>` ni de `evidencia/`.

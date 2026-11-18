@@ -7,7 +7,7 @@ PR.
 2. Tabla de resultados del `README.md` completa.
 3. Tablas y figuras al día (no debe listar nada pendiente):
    ```bash
-   uv run --no-sync asl-cuda informe --tag <tag-adrian> --cpu-tag hansel-apple-m3
+   uv run --no-sync asl-cuda informe --tag <tag-adrian> --cpu-tag fernando-ryzen-ai9 hansel-apple-m3
    ```
    PDF final:
    ```bash

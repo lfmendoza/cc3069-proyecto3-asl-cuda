@@ -18,23 +18,14 @@ Lee también `README.md` (plan y reglas de Git) y `convenciones.md`.
 Te queda: fotos del equipo, evaluarlas con el modelo final, el párrafo de
 fotos de la sección 6.5 y las diapositivas.
 
-### Opcional pero recomendado: repetir la corrida CPU limpia
+### Corrida CPU de referencia
 
-Tu corrida se hizo con otras aplicaciones abiertas (el monitor muestra los
-núcleos de eficiencia ocupados 12–28 % aun con un hilo). Si tienes 40
-minutos, repítela tal cual con todo cerrado, desde la terminal, conectada a
-la corriente:
-
-```bash
-git switch main && git pull && git switch -c hansel/medicion-cpu-2
-bash scripts/corrida_cpu.sh hansel-apple-m3
-```
-
-Reemplaza `results/hansel-apple-m3/` completo. Capturas nuevas: solo la
-ventana del Monitor de Actividad y su ventana "Historial de CPU", sin
-escritorio ni dock; la de paralelo tómala mientras `02-prep-paralelo` está
-procesando la partición `train` (los primeros ~15 s). Si la repites, avisa a
-Fernando: la sección 2.3 cita números tuyos que habría que actualizar.
+Como tu corrida en la M3 se hizo con otras aplicaciones abiertas, Fernando
+repitió la corrida completa en su laptop (Ryzen AI 9 365) en condiciones
+limpias: `results/fernando-ryzen-ai9/`, sección 2.3 del informe. La M3 queda
+en la sección 2.4 como comparación de arquitectura (núcleos de rendimiento y
+de eficiencia), con la advertencia de las condiciones. No hace falta que
+repitas nada.
 
 ## Paso 3 · Fotos del equipo (día 2, los tres)
 
@@ -77,7 +68,7 @@ cuáles? ¿Coinciden con las confusiones del test interno (`top_confusions` en
 Después corre:
 ```bash
 uv run --no-sync asl-cuda summarize --tag hansel-apple-m3
-uv run --no-sync asl-cuda informe --tag <tag-de-adrian> --cpu-tag hansel-apple-m3
+uv run --no-sync asl-cuda informe --tag <tag-de-adrian> --cpu-tag fernando-ryzen-ai9 hansel-apple-m3
 ```
 El primero genera `results/hansel-apple-m3/tablas/evaluacion.md` y las
 matrices de confusión; el segundo copia esa tabla al informe (sección 6.5).
