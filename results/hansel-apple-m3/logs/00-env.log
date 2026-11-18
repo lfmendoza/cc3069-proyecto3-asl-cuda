@@ -1,0 +1,25 @@
+{
+  "host_tag": "hansel-apple-m3",
+  "platform": "macOS-27.3-arm64-arm-64bit",
+  "python": "3.12.5",
+  "cpu": "",
+  "physical_cores": 8,
+  "logical_cores": 8,
+  "ram_gb": 24.0,
+  "device": null,
+  "gpu": {
+    "available": false,
+    "numba_cuda_available": false
+  },
+  "packages": {
+    "torch": "2.14.1",
+    "torchvision": "0.29.2",
+    "numba": "0.68.1",
+    "numba-cuda": null,
+    "numpy": "2.5.5",
+    "pillow": "13.0.0"
+  },
+  "commit": "a183c1e"
+}
+
+Sin GPU CUDA visible: solo se pueden correr las variantes CPU.

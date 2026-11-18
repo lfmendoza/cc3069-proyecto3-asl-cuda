@@ -1,0 +1,18 @@
+{
+  "tag": "hansel-apple-m3",
+  "prep_best_speedup": 1.9830215896994807,
+  "augment_speedups": {
+    "torchvision-PIL (Lab 3)": 1.0,
+    "Numba CPU 1 hilo": 1.07,
+    "Numba CPU 8 hilos": 3.83
+  },
+  "train_speedups": {
+    "CPU 1 hilo (secuencial)": 1.0,
+    "CPU 8 hilos": 0.34
+  },
+  "pipeline_speedups": {
+    "Lab 3 secuencial (0 workers, 1 hilo)": 1.0,
+    "Lab 3 como se entreg\u00f3 (4 workers, 8 hilos)": 0.34,
+    "H\u00edbrido CPU (cach\u00e9 + Numba CPU, 8 hilos)": 0.48
+  }
+}

@@ -1,0 +1,4 @@
+/Users/hansellopez/.matplotlib is not a writable directory
+Matplotlib created a temporary cache directory at /var/folders/jq/zj1d7dc15dd57tj80xs_lvxr0000gn/T/matplotlib-gibf5uc_ because there was an issue with the default path (/Users/hansellopez/.matplotlib); it is highly recommended to set the MPLCONFIGDIR environment variable to a writable directory, in particular to speed up the import of Matplotlib and to better support multiprocessing.
+Matplotlib is building the font cache; this may take a moment.
+Tablas en results/hansel-apple-m3/tablas | figuras en results/hansel-apple-m3/figuras

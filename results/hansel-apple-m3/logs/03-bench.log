@@ -1,0 +1,6 @@
+Equipo: Apple M3 | 8 hilos | GPU: no disponible
+Subconjunto: 1160 imágenes (40 por clase) | fases: pipeline
+  pipeline:Lab 3 secuencial (0 workers, 1 hilo) {'device': 'cpu', 'threads': 1, 'workers': 0}
+  pipeline:Lab 3 como se entregó (4 workers, 8 hilos) {'device': 'cpu', 'threads': 8, 'workers': 4}
+  pipeline:Híbrido CPU (caché + Numba CPU, 8 hilos) {'device': 'cpu', 'threads': 8}
+Resultados en results/hansel-apple-m3/bench
